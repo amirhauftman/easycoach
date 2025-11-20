@@ -1,0 +1,90 @@
+{
+    "match_id": 1061429,
+    "home_team": "Hapoel Ra'anana U17",
+    "away_team": "Maccabi Petah Tikva U17",
+    "home_score": 2,
+    "away_score": 4,
+    "match_date": "2025-10-25T10:00:00Z",
+    "home_team_players": [
+        {
+            "player_id": "207680",
+            "fname": "Yuval",
+            "lname": "MAIMON",
+            "number": 1,
+            "position": "GK",
+            "events": []
+        },
+        {
+            "player_id": "196286",
+            "fname": "Ariel",
+            "lname": "SHVARTZMAN",
+            "number": 10,
+            "position": "RW",
+            "events": []
+        },
+        {
+            "player_id": "204309",
+            "fname": "Yoav",
+            "lname": "AIZENBERG",
+            "number": 11,
+            "position": "ST",
+            "events": [
+                {
+                    "id": 1,
+                    "event_label": "Goal",
+                    "timestamp": 4139.59,
+                    "start_minute": 68,
+                    "start_second": 59,
+                    "good_bad": "good"
+                }
+            ]
+        }
+    ],
+    "away_team_players": [
+        {
+            "player_id": "204651",
+            "fname": "Yuval",
+            "lname": "HOLCKENER",
+            "number": 1,
+            "position": "GK",
+            "events": []
+        },
+        {
+            "player_id": "180595",
+            "fname": "Ben",
+            "lname": "ZOARETZ",
+            "number": 7,
+            "position": "ST",
+            "events": [
+                {
+                    "id": 2,
+                    "event_label": "Goal",
+                    "timestamp": 2171.51,
+                    "start_minute": 36,
+                    "start_second": 51,
+                    "good_bad": "good"
+                }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "id": 1126024,
+            "player_id": "180595",
+            "event_id": 9,
+            "timestamp": 872.72,
+            "start_minute": 0,
+            "start_second": 1,
+            "event_label": "Passes"
+        },
+        {
+            "id": 1109105,
+            "player_id": "207680",
+            "event_id": 19,
+            "timestamp": 1033,
+            "start_minute": 2,
+            "start_second": 41,
+            "event_label": "Build Up"
+        }
+    ]
+}
