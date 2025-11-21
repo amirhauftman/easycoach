@@ -5,7 +5,7 @@ import Pagination from '../common/Pagination';
 
 interface Props {
     matchesByDate: Record<string, any[]>;
-    pageSize?: number;
+    total: number;
 }
 
 // Fake logo generator (emoji or SVG placeholder)
@@ -22,7 +22,7 @@ const getTeamLogo = (team: string, type: 'home' | 'away') => {
 };
 
 
-export const MatchList: React.FC<Props> = ({ matchesByDate, pageSize = 5 }) => {
+export const MatchList: React.FC<Props> = ({ matchesByDate, total }) => {
     const navigate = useNavigate();
     // Flatten all matches from input
     const flat = useMemo(() => {
@@ -58,8 +58,7 @@ export const MatchList: React.FC<Props> = ({ matchesByDate, pageSize = 5 }) => {
     const allDays = Object.keys(groupedByDay).sort((a, b) => b.localeCompare(a));
     const allMatches = allDays.flatMap(day => groupedByDay[day].map(m => ({ ...m, _day: day })));
     const [page, setPage] = useState(1);
-    const [size, setSize] = useState<number>(pageSize);
-    const total = allMatches.length;
+    const [size, setSize] = useState<number>(5);
     const start = (page - 1) * size;
     const pageItems = allMatches.slice(start, start + size);
     // Group pageItems by day for rendering
@@ -106,7 +105,7 @@ export const MatchList: React.FC<Props> = ({ matchesByDate, pageSize = 5 }) => {
                                 const homeScore = m.home_score ?? m.homeScore ?? m.score_home ?? '-';
                                 const awayScore = m.away_score ?? m.awayScore ?? m.score_away ?? '-';
                                 const kickoff = m.kickoff ?? m.kickoff_time ?? m.date ?? m.match_date ?? null;
-                                const comp = m.competition ?? m.league ?? m.competition_name ?? '-';
+                                const comp = m.season_name ?? 'no competition name';
                                 let kickoffLabel = '-';
                                 if (kickoff) {
                                     try {
@@ -116,7 +115,7 @@ export const MatchList: React.FC<Props> = ({ matchesByDate, pageSize = 5 }) => {
                                         kickoffLabel = String(kickoff);
                                     }
                                 }
-                                const matchId = m.match_id ?? m.id;
+                                const matchId = m.game_id ?? m.match_id ?? m.id;
                                 return (
                                     <div key={`${day}-${matchId ?? idx}`} className="match-card">
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
@@ -138,10 +137,15 @@ export const MatchList: React.FC<Props> = ({ matchesByDate, pageSize = 5 }) => {
                                         </div>
                                         <div className="match-meta" style={{ marginTop: 6 }}>
                                             <span><strong>Kick-off:</strong> {kickoffLabel || '-'}</span><br />
-                                            <span><strong>Competition:</strong> {comp || '-'}</span>
+                                            <span><strong>Competition:</strong> {comp}</span>
+                                            {m.pxlt_game_id && (
+                                                <span style={{ display: 'inline-block', marginLeft: 8, color: 'var(--accent)', fontSize: '0.8em' }}>
+                                                    📹 Video available
+                                                </span>
+                                            )}
                                         </div>
                                         {matchId ? (
-                                            <button className="nav-button" style={{ marginTop: 8 }} onClick={() => navigate(`/matches/${matchId}`)}>View Details</button>
+                                            <button className="nav-button" style={{ marginTop: 8 }} onClick={() => navigate(`/matches/${matchId}`, { state: { pxlt_game_id: m.pxlt_game_id } })}>View Details</button>
                                         ) : (
                                             <button className="nav-button" style={{ marginTop: 8 }} disabled title="No match details available">No Details</button>
                                         )}

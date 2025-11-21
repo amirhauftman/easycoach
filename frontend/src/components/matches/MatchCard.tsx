@@ -1,15 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     match: any;
 }
 
 export const MatchCard: React.FC<Props> = ({ match }) => {
-    const id = match.match_id ?? match.id ?? match.matchId
+    const navigate = useNavigate();
+    const id = match.game_id ?? match.id ?? match.match_id ?? match.matchId
     const onOpen = () => {
+        console.log('MatchCard onClick, match:', match, 'id:', id);
         if (id) {
-            // simple hash-based navigation used in App
-            window.location.hash = `#/match/${id}`
+            navigate(`/matches/${id}`);
         }
     }
 
