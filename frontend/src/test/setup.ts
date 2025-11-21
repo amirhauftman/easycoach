@@ -1,23 +1,13 @@
-import '@testing-library/jest-dom'
 import { vi } from 'vitest';
 
-// Mock Chart.js with all necessary exports
+// Mock Chart.js
 vi.mock('chart.js', () => ({
-    Chart: {
-        register: vi.fn(),
-        ...vi.fn().mockImplementation(() => ({
-            destroy: vi.fn(),
-            update: vi.fn(),
-            resize: vi.fn(),
-        })),
-    },
+    Chart: vi.fn().mockImplementation(() => ({
+        destroy: vi.fn(),
+        update: vi.fn(),
+        resize: vi.fn(),
+    })),
     registerables: [],
-    RadialLinearScale: vi.fn(),
-    PointElement: vi.fn(),
-    LineElement: vi.fn(),
-    Filler: vi.fn(),
-    Tooltip: vi.fn(),
-    Legend: vi.fn(),
 }));
 
 // Mock react-chartjs-2

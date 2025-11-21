@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest';
 import SkillRadar from '../SkillRadar';
 
 describe('SkillRadar', () => {
@@ -11,7 +12,7 @@ describe('SkillRadar', () => {
     });
 
     it('updates value on slider change and calls onChange', () => {
-        const handle = jest.fn();
+        const handle = vi.fn();
         render(<SkillRadar skills={skills} editable={true} onChange={handle} />);
         const input = screen.getByLabelText(/Passing skill/) as HTMLInputElement;
         fireEvent.change(input, { target: { value: '8' } });

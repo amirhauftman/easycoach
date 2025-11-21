@@ -7,7 +7,7 @@ import { useMatchesCache } from '../hooks/useMatchesCache';
 
 const MatchesPage: React.FC = () => {
     // Use cache hook instead of manual fetch
-    const { data: matches, loading, error, refetch } = useMatchesCache({
+    const { data: matches, loading, error } = useMatchesCache({
         cacheKey: 'all-matches',
         fetchFn: async () => {
             const fetchedMatches = await easycoachAPI.fetchMatches(0, 1000);

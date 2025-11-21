@@ -3,7 +3,7 @@
 import { useMatchesList } from '../hooks/useMatchesCache';
 
 export function MatchList() {
-    const { data: matches, loading, error, refetch } = useMatchesList('/api/matches');
+    const { data: matches, loading, error } = useMatchesList('/api/matches');
 
     if (loading) return <div>Loading matches...</div>;
     if (error) return <div>Error: {error.message}</div>;
