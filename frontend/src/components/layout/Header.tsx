@@ -1,16 +1,33 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import './Header.css';
 
-export type NavView = 'matches' | 'players' | 'video';
+const Header: React.FC = () => {
+    const location = useLocation();
 
-export const Header: React.FC<{ onNavigate?: (view: NavView) => void }> = ({ onNavigate }) => (
-    <header className="app-header">
-        <div className="logo-text">EasyCoach</div>
-        <nav className="nav">
-            <button className="nav-button" onClick={(e) => { e.preventDefault(); onNavigate?.('matches'); }}>Matches</button>
-            <button className="nav-button" onClick={(e) => { e.preventDefault(); onNavigate?.('players'); }}>Players</button>
-            <button className="nav-button" onClick={(e) => { e.preventDefault(); onNavigate?.('video'); }}>Video</button>
-        </nav>
-    </header>
-);
+    return (
+        <header className="header">
+            <div className="header-content">
+                <Link to="/" className="logo">
+                    <h1>EasyCoach</h1>
+                </Link>
+                <nav className="nav">
+                    <Link
+                        to="/matches"
+                        className={`nav-link ${location.pathname.startsWith('/matches') || location.pathname === '/' ? 'active' : ''}`}
+                    >
+                        Matches
+                    </Link>
+                    <Link
+                        to="/players"
+                        className={`nav-link ${location.pathname.startsWith('/players') ? 'active' : ''}`}
+                    >
+                        Players
+                    </Link>
+                </nav>
+            </div>
+        </header>
+    );
+};
 
 export default Header;

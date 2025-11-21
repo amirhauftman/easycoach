@@ -58,10 +58,29 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-#root {
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
   max-width: 1200px;
-  margin: 24px auto;
-  padding: 20px
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+}
+
+#root {
+  margin: 0;
+  padding: 0;
 }
 
 .app-header {

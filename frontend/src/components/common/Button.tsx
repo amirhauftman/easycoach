@@ -1,12 +1,17 @@
 import React from 'react';
+import styles from '../../styles/Button.module.css';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-export const Button: React.FC<ButtonProps> = ({ children, ...props }) => {
+export const Button: React.FC<ButtonProps> = ({ children, className, ...props }) => {
   return (
-    <button {...props} style={{ padding: '8px 12px', borderRadius: 6, cursor: 'pointer' }}>
+    <button
+      {...props}
+      className={`${styles.button} ${className || ''}`}
+      type={props.type || 'button'}
+    >
       {children}
     </button>
   );

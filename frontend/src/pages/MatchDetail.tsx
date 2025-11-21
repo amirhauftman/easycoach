@@ -1,36 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import MatchPlayer, { type MatchPlayerHandle } from '../components/video/MatchPlayer';
 import { easycoachAPI } from '../services/easycoach-api';
-import type { ApiMatchDetail } from '../services/easycoach-api';
+import type { Player, Lineup, Event } from '../types';
 import ErrorMessage from '../components/common/ErrorMessage';
 import Loading from '../components/common/Loading';
 import EventsTab from '../components/matches/EventsTab';
+import { useMatchDetail } from '../hooks/useMatchDetail';
 import '../App.css';
 
 const TABS: { key: 'lineups' | 'events'; label: string }[] = [
     { key: 'lineups', label: 'Lineups' },
     { key: 'events', label: 'Match Events' },
 ];
-
-type Player = {
-    id: string | number;
-    name: string;
-    shirt_number?: string | number;
-    position?: string;
-};
-
-type Lineup = {
-    starters: Player[];
-    subs: Player[];
-};
-
-type Event = {
-    minute: number;
-    type: string;
-    timestamp?: number;
-    player?: Player;
-};
 
 function normalizeLineup(lineup?: Lineup): Lineup {
     if (!lineup) return { starters: [], subs: [] };
@@ -44,107 +26,81 @@ export default function MatchDetail() {
     const { matchId } = useParams<{ matchId: string }>();
     const navigate = useNavigate();
     const location = useLocation();
-    const [matchData, setMatchData] = useState<ApiMatchDetail | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const { matchData, loading, error } = useMatchDetail(matchId);
     const [tab, setTab] = useState<'lineups' | 'events'>('lineups');
     const playerRef = useRef<MatchPlayerHandle | null>(null);
 
     // Get pxlt_game_id from navigation state if available
     const pxltGameIdFromState = location.state?.pxlt_game_id;
 
-    useEffect(() => {
-        if (!matchId) return;
+    const computedData = useMemo(() => {
+        if (!matchData) return null;
 
-        setLoading(true);
-        setError(null);
+        const match = {
+            vid: matchData.video?.normal_hls,
+            home_team: { name: matchData.home_team },
+            away_team: { name: matchData.away_team },
+            pxlt_game_id: matchData.pxlt_game_id,
+            home_lineup: {
+                starters: matchData.home_team_players.filter(p => p.is_sub === 0).map(p => ({
+                    id: p.player_id,
+                    name: easycoachAPI.formatPlayerName(p),
+                    shirt_number: p.number,
+                    position: p.position
+                })),
+                subs: matchData.home_team_players.filter(p => p.is_sub === 1).map(p => ({
+                    id: p.player_id,
+                    name: easycoachAPI.formatPlayerName(p),
+                    shirt_number: p.number,
+                    position: p.position
+                }))
+            },
+            away_lineup: {
+                starters: matchData.away_team_players.filter(p => p.is_sub === 0).map(p => ({
+                    id: p.player_id,
+                    name: easycoachAPI.formatPlayerName(p),
+                    shirt_number: p.number,
+                    position: p.position
+                })),
+                subs: matchData.away_team_players.filter(p => p.is_sub === 1).map(p => ({
+                    id: p.player_id,
+                    name: easycoachAPI.formatPlayerName(p),
+                    shirt_number: p.number,
+                    position: p.position
+                }))
+            },
+            events: easycoachAPI.extractMatchEvents([...matchData.home_team_players, ...matchData.away_team_players], matchData.events)
+                .map(event => ({
+                    minute: event.start_minute,
+                    type: event.event_type || 'unknown',
+                    timestamp: event.timestamp || (event.start_minute * 60 + (event.start_second || 0)),
+                    player: {
+                        id: event.player_id,
+                        name: matchData.home_team_players.find(p => p.player_id === event.player_id)
+                            ? easycoachAPI.formatPlayerName(matchData.home_team_players.find(p => p.player_id === event.player_id)!)
+                            : matchData.away_team_players.find(p => p.player_id === event.player_id)
+                                ? easycoachAPI.formatPlayerName(matchData.away_team_players.find(p => p.player_id === event.player_id)!)
+                                : 'Unknown Player'
+                    }
+                }))
+        };
 
-        console.log('Fetching match details for matchId:', matchId);
-        easycoachAPI.fetchMatchDetail(matchId)
-            .then((data) => {
-                console.log('Match details response:', data);
-                setMatchData(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error('Failed to fetch match details:', err);
-                setError('Failed to load match details');
-                setLoading(false);
-            });
-    }, [matchId]);
+        const hasVideo = !!pxltGameIdFromState || !!match.pxlt_game_id || !!matchData.video?.normal_hls;
+        const videoUrl = matchData.video?.normal_hls;
+        const homeLineup = normalizeLineup(match.home_lineup);
+        const awayLineup = normalizeLineup(match.away_lineup);
+        const events = Array.isArray(match.events) ? match.events : [];
+
+        return { match, hasVideo, videoUrl, homeLineup, awayLineup, events };
+    }, [matchData, pxltGameIdFromState]);
 
     if (loading) return <Loading />;
     if (error) return <ErrorMessage error={error} />;
-    if (!matchData) {
+    if (!matchData || !computedData) {
         return <div className="panel">No details available for this match.</div>;
     }
 
-    // Transform API data to component format
-    const match = {
-        vid: matchData.video?.normal_hls,
-        home_team: { name: matchData.home_team },
-        away_team: { name: matchData.away_team },
-        pxlt_game_id: matchData.pxlt_game_id,
-        home_lineup: {
-            starters: matchData.home_team_players.filter(p => p.is_sub === 0).map(p => ({
-                id: p.player_id,
-                name: easycoachAPI.formatPlayerName(p),
-                shirt_number: p.number,
-                position: p.position
-            })),
-            subs: matchData.home_team_players.filter(p => p.is_sub === 1).map(p => ({
-                id: p.player_id,
-                name: easycoachAPI.formatPlayerName(p),
-                shirt_number: p.number,
-                position: p.position
-            }))
-        },
-        away_lineup: {
-            starters: matchData.away_team_players.filter(p => p.is_sub === 0).map(p => ({
-                id: p.player_id,
-                name: easycoachAPI.formatPlayerName(p),
-                shirt_number: p.number,
-                position: p.position
-            })),
-            subs: matchData.away_team_players.filter(p => p.is_sub === 1).map(p => ({
-                id: p.player_id,
-                name: easycoachAPI.formatPlayerName(p),
-                shirt_number: p.number,
-                position: p.position
-            }))
-        },
-        events: easycoachAPI.extractMatchEvents([...matchData.home_team_players, ...matchData.away_team_players], matchData.events)
-            .map(event => ({
-                minute: event.start_minute,
-                type: event.event_type || 'unknown',
-                timestamp: event.timestamp || (event.start_minute * 60 + (event.start_second || 0)),
-                player: {
-                    id: event.player_id,
-                    name: matchData.home_team_players.find(p => p.player_id === event.player_id)
-                        ? easycoachAPI.formatPlayerName(matchData.home_team_players.find(p => p.player_id === event.player_id)!)
-                        : matchData.away_team_players.find(p => p.player_id === event.player_id)
-                            ? easycoachAPI.formatPlayerName(matchData.away_team_players.find(p => p.player_id === event.player_id)!)
-                            : 'Unknown Player'
-                }
-            }))
-    };
-
-    const hasVideo = !!pxltGameIdFromState || !!match.pxlt_game_id || !!matchData.video?.normal_hls;
-    const videoUrl = matchData.video?.normal_hls;
-
-    // console.log('MatchDetail video debug:', {
-    //     pxltGameIdFromState,
-    //     matchPxltGameId: match.pxlt_game_id,
-    //     hasVideo,
-    //     videoGameId,
-    //     videoUrl,
-    //     fullVideoObject: matchData.video
-    // });
-    const homeLineup = normalizeLineup(match.home_lineup);
-    const awayLineup = normalizeLineup(match.away_lineup);
-    const events = Array.isArray(match.events) ? match.events : [];
-
-    console.log('Extracted events:', events);
+    const { match, hasVideo, videoUrl, homeLineup, awayLineup, events } = computedData;
 
     function handleEventClick(event: Event) {
         if (!hasVideo || match.pxlt_game_id) return; // Only seek for HLS, not Pixellot

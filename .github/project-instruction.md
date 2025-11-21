@@ -4,8 +4,8 @@
 Full-stack sports analytics application integrating with EasyCoach API to display matches, players, and statistics.
 
 ## Tech Stack
-- **Frontend**: React 18, TypeScript, TanStack Query, Zustand, Zod, Tailwind CSS
-- **Backend**: NestJS, TypeORM, MySQL, Cache Manager
+- **Frontend**: React 18, TypeScript, TanStack Query, Zustand, Zod
+- **Backend**: NestJS, TypeORM, MySQL
 - **Testing**: Jest, React Testing Library, Supertest
 - **DevOps**: Docker, Docker Compose
 

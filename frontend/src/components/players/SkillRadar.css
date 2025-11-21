@@ -1,0 +1,48 @@
+.skill-radar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+}
+
+.skill-sliders {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.skill-slider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.skill-slider label {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.skill-slider input {
+    width: 150px;
+}
+
+@media (max-width:600px) {
+    .skill-radar {
+        padding: 8px
+    }
+
+    .skill-slider input {
+        width: 120px
+    }
+
+    .skill-sliders {
+        gap: 8px
+    }
+}
+
+.skill-value {
+    font-size: 12px;
+    margin-top: 4px
+}

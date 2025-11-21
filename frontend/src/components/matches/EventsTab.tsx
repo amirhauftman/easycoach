@@ -1,16 +1,5 @@
 import React from 'react';
-
-type Player = {
-    id: string | number;
-    name: string;
-};
-
-type Event = {
-    minute: number;
-    type: string;
-    timestamp?: number;
-    player?: Player;
-};
+import type { Event, Player } from '../../types';
 
 const eventTypes: Record<string, string> = {
     goal: 'Goal',
@@ -23,7 +12,7 @@ export const EventsTab: React.FC<{
     isPixellot: boolean;
     onEventClick: (event: Event) => void;
     onPlayerClick: (player: Player) => void;
-}> = ({ events, hasVideo, isPixellot, onEventClick, onPlayerClick }) => {
+}> = React.memo(({ events, hasVideo, isPixellot, onEventClick, onPlayerClick }) => {
     const filteredEvents = events.filter(e => e.type === 'goal' || e.type === 'yellow_card');
 
     if (filteredEvents.length === 0) return <div>No events</div>;
@@ -56,6 +45,6 @@ export const EventsTab: React.FC<{
             </table>
         </div>
     );
-};
+});
 
 export default EventsTab;

@@ -1,0 +1,55 @@
+.player-header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.player-avatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 8px;
+    background: #e6e9ee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #2b2b2b;
+}
+
+.player-info h1 {
+    margin: 0;
+    font-size: 20px
+}
+
+.player-info p {
+    margin: 2px 0;
+    color: var(--muted, #6b7280)
+}
+
+.player-team {
+    display: flex;
+    gap: 8px;
+    align-items: center
+}
+
+.team-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px
+}
+
+@media (max-width:600px) {
+    .player-header {
+        flex-direction: row;
+        align-items: flex-start
+    }
+
+    .player-info h1 {
+        font-size: 16px
+    }
+
+    .player-avatar {
+        width: 56px;
+        height: 56px
+    }
+}
