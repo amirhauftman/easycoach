@@ -1,13 +1,50 @@
 // EasyCoach API service functions
 import type { ApiMatch, ApiMatchDetail, ApiPlayer, ApiEvent } from '../types';
 
-const API_BASE_URL = 'https://ifa.easycoach.club/en/api/v3/analytics';
-const USER_TOKEN = 'YZ3p3MUqQV3KArSSqOrz8SwEIfyFRxRe';
+const API_BASE_URL = 'http://localhost:3000/api';
 const LEAGUE_ID = '726';
 const SEASON_ID = '26';
 
+// In-memory cache for the session
+interface CacheEntry {
+    data: any;
+    timestamp: number;
+    ttl: number;
+}
+
 // API service class
 class EasyCoachAPI {
+    private cache = new Map<string, CacheEntry>();
+
+    private getCachedData(key: string): any | null {
+        const entry = this.cache.get(key);
+        if (!entry) return null;
+
+        const now = Date.now();
+        if (now - entry.timestamp > entry.ttl) {
+            this.cache.delete(key);
+            return null;
+        }
+
+        console.log(`[FRONTEND CACHE] Cache HIT for ${key}`);
+        return entry.data;
+    }
+
+    private setCachedData(key: string, data: any, ttl: number = 30 * 60 * 1000): void {
+        console.log(`[FRONTEND CACHE] Setting cache for ${key}, TTL: ${ttl}ms`);
+        this.cache.set(key, {
+            data,
+            timestamp: Date.now(),
+            ttl
+        });
+    }
+
+    // Public method to clear frontend cache
+    public clearCache(): void {
+        console.log('[FRONTEND CACHE] Clearing all cached data');
+        this.cache.clear();
+    }
+
     private async fetchWithErrorHandling(url: string): Promise<any> {
         try {
             const response = await fetch(url);
@@ -23,28 +60,26 @@ class EasyCoachAPI {
         }
     }
 
-    async fetchMatches(offset: number = 0, limit: number = 50): Promise<ApiMatch[]> {
-        const url = `${API_BASE_URL}/league?league_id=${LEAGUE_ID}&season_id=${SEASON_ID}&user_token=${USER_TOKEN}&offset=${offset}&limit=${limit}`;
+    async fetchMatches(): Promise<Record<string, ApiMatch[]>> {
+        const cacheKey = `matches:${LEAGUE_ID}:${SEASON_ID}`;
+
+        // Check frontend cache first
+        const cachedData = this.getCachedData(cacheKey);
+        if (cachedData) {
+            return cachedData;
+        }
+
+        const url = `${API_BASE_URL}/matches?leagueId=${LEAGUE_ID}&seasonId=${SEASON_ID}`;
+        console.log(`[FRONTEND CACHE] Cache MISS for ${cacheKey} - fetching from backend`);
 
         try {
-            const data = await this.fetchWithErrorHandling(url);
-            console.log('Fetched matches data:', data);
+            const response = await this.fetchWithErrorHandling(url);
 
-            // The API might return matches in different formats, adapt as needed
-            let matches: any[] = [];
-            if (Array.isArray(data)) {
-                matches = data;
-            } else if (data.matches) {
-                matches = data.matches;
-            } else if (data.data) {
-                matches = data.data;
-            } else {
-                console.warn('Unexpected API response format:', data);
-                return [];
-            }
+            // Backend returns a flat array of matches, not grouped
+            const matches = Array.isArray(response) ? response : [];
 
-            // Parse result field to extract scores
-            const parsedMatches = matches.map(match => {
+            // Transform matches to our format
+            const transformedMatches: ApiMatch[] = matches.map(match => {
                 const result = match.result;
                 let home_score: number | undefined;
                 let away_score: number | undefined;
@@ -63,8 +98,8 @@ class EasyCoachAPI {
                     home_team: match.team_a_name_en || match.team_a_name,
                     away_team: match.team_b_name_en || match.team_b_name,
                     kickoff: match.date + ' ' + match.hour,
-                    competition: match.fixture_name_en || match.fixture_name,
-                    match_date: match.date,
+                    competition: Array.isArray(match.fixture_name_en) ? match.fixture_name : match.fixture_name,
+                    match_date: match.date, // This field exists in the API response
                     home_team_id: match.team_a_id,
                     away_team_id: match.team_b_id,
                     home_score,
@@ -74,16 +109,21 @@ class EasyCoachAPI {
                 };
             });
 
-            console.log('Parsed matches:', parsedMatches);
-            return parsedMatches;
+            // Group matches by date using the existing utility method
+            const groupedMatches = this.groupMatchesByDate(transformedMatches);
+
+            // Cache the result for 30 minutes
+            this.setCachedData(cacheKey, groupedMatches, 30 * 60 * 1000);
+
+            return groupedMatches;
         } catch (error) {
             console.error('Failed to fetch matches:', error);
-            throw new Error('Failed to fetch matches from EasyCoach API');
+            throw new Error('Failed to fetch matches from backend API');
         }
     }
 
     async fetchMatchDetail(matchId: string): Promise<ApiMatchDetail> {
-        // For match 1061429, load from local JSON file
+        // For match 1061429, load from local JSON file (demo)
         if (matchId === '1061429') {
             try {
                 const response = await fetch('/data/match-1061429.json');
@@ -139,8 +179,8 @@ class EasyCoachAPI {
             }
         }
 
-        // Original API fetch for other matches
-        const url = `${API_BASE_URL}/match?match_id=${matchId}&user_token=${USER_TOKEN}`;
+        // Call backend for other matches
+        const url = `${API_BASE_URL}/matches/${matchId}`;
 
         try {
             const data = await this.fetchWithErrorHandling(url);
@@ -207,7 +247,7 @@ class EasyCoachAPI {
             return data;
         } catch (error) {
             console.error('Failed to fetch match detail:', error);
-            throw new Error('Failed to fetch match details from EasyCoach API');
+            throw new Error('Failed to fetch match details from backend API');
         }
     }
 

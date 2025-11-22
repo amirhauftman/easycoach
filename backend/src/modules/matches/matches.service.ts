@@ -16,32 +16,31 @@ export class MatchesService {
 
     async getMatches(leagueId: string, seasonId: string) {
         const key = this.cacheKey(leagueId, seasonId);
+        console.log(`[CACHE] Checking cache for key: ${key}`);
+
         const cached = await this.cacheManager.get(key);
         if (cached) {
-            return { data: cached, meta: { cached: true } };
+            console.log(`[CACHE] Cache HIT for ${key} - returning ${Array.isArray(cached) ? cached.length : 0} matches`);
+            return cached;
         }
 
+        console.log(`[CACHE] Cache MISS for ${key} - fetching from external API`);
         const data = await this.api.fetchLeagueMatches(leagueId, seasonId);
-        await this.cacheManager.set(key, data, 60 * 5);
 
         // The external API may return an object rather than a plain array.
         // Normalize possible shapes into an array we can reduce over.
         const list: any[] = Array.isArray(data)
             ? data
             : Array.isArray(data?.data)
-            ? data.data
-            : Array.isArray(data?.matches)
-            ? data.matches
-            : [];
+                ? data.data
+                : Array.isArray(data?.matches)
+                    ? data.matches
+                    : [];
 
-        const grouped = list.reduce((acc: any, item: any) => {
-            const date = (item.match_date || item.kickoff || '').slice(0, 10) || 'unknown';
-            acc[date] = acc[date] || [];
-            acc[date].push(item);
-            return acc;
-        }, {});
+        console.log(`[CACHE] Setting cache for ${key} with ${list.length} matches, TTL: 1800 seconds (30 minutes)`);
+        await this.cacheManager.set(key, list, 1800); // 30 minutes cache
 
-        return { data: grouped, meta: { cached: false } };
+        return list;
     }
 
     async getMatchById(matchId: string) {

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // Example 1: Using in MatchList component
-import { useMatchesList } from '../hooks/useMatchesCache';
+import { useMatchesList } from '../hooks/useDataFetch';
 
 export function MatchList() {
     const { data: matches, loading, error } = useMatchesList('/api/matches');
@@ -19,7 +19,7 @@ export function MatchList() {
 }
 
 // Example 2: Using for match detail page
-import { useMatchDetail } from '../hooks/useMatchesCache';
+import { useMatchDetail } from '../hooks/useDataFetch';
 import { useParams } from 'react-router-dom';
 
 export function MatchDetailPage() {
@@ -37,19 +37,17 @@ export function MatchDetailPage() {
     );
 }
 
-// Example 3: Custom cache usage for players
-import { useMatchesCache } from '../hooks/useMatchesCache';
+// Example 3: Custom data fetching for players
+import { useMatchesCache } from '../hooks/useDataFetch';
 
 export function PlayersPage() {
-    const { data: players, loading, clearCache } = useMatchesCache({
-        cacheKey: 'players-list',
-        fetchFn: () => fetch('/api/players').then(r => r.json()),
-        ttl: 10 * 60 * 1000 // 10 minutes
+    const { data: players, loading, refetch } = useMatchesCache({
+        fetchFn: () => fetch('/api/players').then(r => r.json())
     });
 
     return (
         <div>
-            <button onClick={clearCache}>Clear Cache</button>
+            <button onClick={refetch}>Refresh Players</button>
             {loading && <div>Loading...</div>}
             {players && <div>Players loaded: {players.length}</div>}
         </div>
