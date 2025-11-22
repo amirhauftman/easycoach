@@ -55,8 +55,67 @@ export const MatchList: React.FC<Props> = ({ matchesByDate, total }) => {
     }, [flat]);
 
     // Pagination logic
-    const allDays = Object.keys(groupedByDay).sort((a, b) => b.localeCompare(a));
-    const allMatches = allDays.flatMap(day => groupedByDay[day].map(m => ({ ...m, _day: day })));
+    const allDays = Object.keys(groupedByDay).sort((a, b) => {
+        // Sort dates descending (most recent first)
+        if (a === '-' || b === '-') return a === '-' ? 1 : -1;
+        try {
+            const dateA = new Date(a);
+            const dateB = new Date(b);
+            return dateB.getTime() - dateA.getTime();
+        } catch {
+            return b.localeCompare(a);
+        }
+    });
+    const allMatches = allDays.flatMap(day => {
+        // Sort matches within each day by kickoff time
+        const dayMatches = groupedByDay[day].sort((a: any, b: any) => {
+            const timeA = a.kickoff ?? a.kickoff_time ?? a.date ?? a.match_date ?? '';
+            const timeB = b.kickoff ?? b.kickoff_time ?? b.date ?? b.match_date ?? '';
+            try {
+                const dateA = new Date(timeA);
+                const dateB = new Date(timeB);
+                return dateA.getTime() - dateB.getTime();
+            } catch {
+                return String(timeA).localeCompare(String(timeB));
+            }
+        });
+        return dayMatches.map(m => ({ ...m, _day: day }));
+    }).sort((a, b) => {
+        // Overall sort by full date/time descending (most recent first)
+        const timeA = a.kickoff ?? a.kickoff_time ?? a.date ?? a.match_date ?? '';
+        const timeB = b.kickoff ?? b.kickoff_time ?? b.date ?? b.match_date ?? '';
+
+        const parseDate = (dateStr: string) => {
+            if (!dateStr) return null;
+
+            // Handle DD/MM/YY HH:MM format
+            const ddmmyyPattern = /(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:\s+(\d{1,2}):(\d{2}))?/;
+            const match = String(dateStr).match(ddmmyyPattern);
+
+            if (match) {
+                const [, day, month, year, hour = '0', minute = '0'] = match;
+                const fullYear = year.length === 2 ? 2000 + parseInt(year) : parseInt(year);
+                return new Date(fullYear, parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+            }
+
+            // Fallback to standard Date parsing
+            try {
+                return new Date(dateStr);
+            } catch {
+                return null;
+            }
+        };
+
+        const dateA = parseDate(String(timeA));
+        const dateB = parseDate(String(timeB));
+
+        if (dateA && dateB && !isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+            return dateB.getTime() - dateA.getTime();
+        }
+
+        // Fallback to string comparison
+        return String(timeB).localeCompare(String(timeA));
+    });
     const [page, setPage] = useState(1);
     const [size, setSize] = useState<number>(5);
     const start = (page - 1) * size;
