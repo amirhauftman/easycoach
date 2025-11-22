@@ -13,11 +13,11 @@ import { AppService } from './app.service';
 const shouldUseTypeOrm = !!process.env.DATABASE_HOST;
 const typeOrmImport = shouldUseTypeOrm
   ? [
-      TypeOrmModule.forRootAsync({
-        inject: [ConfigService],
-        useFactory: (config: ConfigService) => createTypeOrmOptions(config),
-      }),
-    ]
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => createTypeOrmOptions(config),
+    }),
+  ]
   : [];
 
 @Module({
@@ -28,8 +28,9 @@ const typeOrmImport = shouldUseTypeOrm
       isGlobal: true,
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => ({
-        ttl: config.get('cache.ttl') ?? 300,
-        max: 100,
+        ttl: config.get('cache.ttl') ?? 1800000, // 30 minutes in milliseconds
+        max: 100, // max number of items in cache
+        refreshThreshold: 0.8, // refresh when 80% of TTL is reached
       }),
     }),
     HttpModule.register({ timeout: 10000 }),

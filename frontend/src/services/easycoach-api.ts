@@ -5,45 +5,8 @@ const API_BASE_URL = 'http://localhost:3000/api';
 const LEAGUE_ID = '726';
 const SEASON_ID = '26';
 
-// In-memory cache for the session
-interface CacheEntry {
-    data: any;
-    timestamp: number;
-    ttl: number;
-}
-
 // API service class
 class EasyCoachAPI {
-    private cache = new Map<string, CacheEntry>();
-
-    private getCachedData(key: string): any | null {
-        const entry = this.cache.get(key);
-        if (!entry) return null;
-
-        const now = Date.now();
-        if (now - entry.timestamp > entry.ttl) {
-            this.cache.delete(key);
-            return null;
-        }
-
-        console.log(`[FRONTEND CACHE] Cache HIT for ${key}`);
-        return entry.data;
-    }
-
-    private setCachedData(key: string, data: any, ttl: number = 30 * 60 * 1000): void {
-        console.log(`[FRONTEND CACHE] Setting cache for ${key}, TTL: ${ttl}ms`);
-        this.cache.set(key, {
-            data,
-            timestamp: Date.now(),
-            ttl
-        });
-    }
-
-    // Public method to clear frontend cache
-    public clearCache(): void {
-        console.log('[FRONTEND CACHE] Clearing all cached data');
-        this.cache.clear();
-    }
 
     private async fetchWithErrorHandling(url: string): Promise<any> {
         try {
@@ -61,21 +24,10 @@ class EasyCoachAPI {
     }
 
     async fetchMatches(): Promise<Record<string, ApiMatch[]>> {
-        const cacheKey = `matches:${LEAGUE_ID}:${SEASON_ID}`;
-
-        // Check frontend cache first
-        const cachedData = this.getCachedData(cacheKey);
-        if (cachedData) {
-            return cachedData;
-        }
-
         const url = `${API_BASE_URL}/matches?leagueId=${LEAGUE_ID}&seasonId=${SEASON_ID}`;
-        console.log(`[FRONTEND CACHE] Cache MISS for ${cacheKey} - fetching from backend`);
 
         try {
-            const response = await this.fetchWithErrorHandling(url);
-
-            // Backend returns a flat array of matches, not grouped
+            const response = await this.fetchWithErrorHandling(url);            // Backend returns a flat array of matches, not grouped
             const matches = Array.isArray(response) ? response : [];
 
             // Transform matches to our format
@@ -111,10 +63,6 @@ class EasyCoachAPI {
 
             // Group matches by date using the existing utility method
             const groupedMatches = this.groupMatchesByDate(transformedMatches);
-
-            // Cache the result for 30 minutes
-            this.setCachedData(cacheKey, groupedMatches, 30 * 60 * 1000);
-
             return groupedMatches;
         } catch (error) {
             console.error('Failed to fetch matches:', error);

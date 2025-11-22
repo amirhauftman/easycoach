@@ -1,9 +1,8 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import MatchList from '../components/matches/MatchList';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
-import { easycoachAPI } from '../services/easycoach-api';
-import { useMatchesCache } from '../hooks/useDataFetch';
+import { useMatches } from '../hooks/useQueries';
 import type { ApiMatch } from '../types';
 
 const MatchesPage: React.FC = () => {
@@ -24,16 +23,8 @@ const MatchesPage: React.FC = () => {
         });
     }, []);
 
-    // Memoize the fetchFn to prevent unnecessary re-renders
-    const fetchFn = useCallback(async () => {
-        const fetchedMatches = await easycoachAPI.fetchMatches();
-        return fetchedMatches;
-    }, []);
-
-    // Fetch matches (relies on backend NestJS caching)
-    const { data: matchesByDate, loading, error, refetch } = useMatchesCache<Record<string, ApiMatch[]>>({
-        fetchFn
-    });
+    // Use our custom hook for data fetching with backend caching
+    const { data: matchesByDate, isLoading: loading, error, refetch } = useMatches();
 
     // fetchMatches already returns matches grouped by date, no need to group again
     // Calculate total matches from the grouped data
@@ -55,17 +46,17 @@ const MatchesPage: React.FC = () => {
             <div className="page-header">
                 <h1>Matches</h1>
                 <p>View all football matches organized by date</p>
-                {/* <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem' }}>
-                    <button onClick={refetch}>
+                <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem' }}>
+                    <button onClick={() => refetch()}>
                         Refresh Matches
                     </button>
                     <button onClick={() => {
-                        easycoachAPI.clearCache();
-                        refetch();
+                        // Refresh the page to get fresh data (backend cache will handle efficiency)
+                        window.location.reload();
                     }}>
                         Clear Cache & Refresh
                     </button>
-                </div> */}
+                </div>
             </div>
             <MatchList matchesByDate={matchesByDate || {}} total={totalMatches} />
         </div>

@@ -6,7 +6,7 @@ import type { Player, Lineup, Event } from '../types';
 import ErrorMessage from '../components/common/ErrorMessage';
 import Loading from '../components/common/Loading';
 import EventsTab from '../components/matches/EventsTab';
-import { useMatchDetail } from '../hooks/useMatchDetail';
+import { useMatchDetail } from '../hooks/useQueries';
 import '../App.css';
 
 const TABS: { key: 'lineups' | 'events'; label: string }[] = [
@@ -26,7 +26,7 @@ export default function MatchDetail() {
     const { matchId } = useParams<{ matchId: string }>();
     const navigate = useNavigate();
     const location = useLocation();
-    const { matchData, loading, error } = useMatchDetail(matchId);
+    const { data: matchData, isLoading: loading, error } = useMatchDetail(matchId!);
     const [tab, setTab] = useState<'lineups' | 'events'>('lineups');
     const playerRef = useRef<MatchPlayerHandle | null>(null);
 
@@ -95,7 +95,7 @@ export default function MatchDetail() {
     }, [matchData, pxltGameIdFromState]);
 
     if (loading) return <Loading />;
-    if (error) return <ErrorMessage error={error} />;
+    if (error) return <ErrorMessage error={error.message} />;
     if (!matchData || !computedData) {
         return <div className="panel">No details available for this match.</div>;
     }

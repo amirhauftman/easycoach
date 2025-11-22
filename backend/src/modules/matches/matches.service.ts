@@ -16,15 +16,16 @@ export class MatchesService {
 
     async getMatches(leagueId: string, seasonId: string) {
         const key = this.cacheKey(leagueId, seasonId);
-        console.log(`[CACHE] Checking cache for key: ${key}`);
+        const requestId = Math.random().toString(36).substring(7);
+        console.log(`[CACHE:${requestId}] Checking cache for key: ${key}`);
 
         const cached = await this.cacheManager.get(key);
         if (cached) {
-            console.log(`[CACHE] Cache HIT for ${key} - returning ${Array.isArray(cached) ? cached.length : 0} matches`);
+            console.log(`[CACHE:${requestId}] Cache HIT for ${key} - returning ${Array.isArray(cached) ? cached.length : 0} matches`);
             return cached;
         }
 
-        console.log(`[CACHE] Cache MISS for ${key} - fetching from external API`);
+        console.log(`[CACHE:${requestId}] Cache MISS for ${key} - fetching from external API`);
         const data = await this.api.fetchLeagueMatches(leagueId, seasonId);
 
         // The external API may return an object rather than a plain array.
@@ -37,8 +38,13 @@ export class MatchesService {
                     ? data.matches
                     : [];
 
-        console.log(`[CACHE] Setting cache for ${key} with ${list.length} matches, TTL: 1800 seconds (30 minutes)`);
-        await this.cacheManager.set(key, list, 1800); // 30 minutes cache
+        console.log(`[CACHE:${requestId}] Setting cache for ${key} with ${list.length} matches, TTL: 1800000ms (30 minutes)`);
+        // Use milliseconds for TTL to be more explicit
+        await this.cacheManager.set(key, list, 1800000); // 30 minutes in milliseconds
+
+        // Verify the cache was set
+        const verify = await this.cacheManager.get(key);
+        console.log(`[CACHE:${requestId}] Cache verification: ${verify ? 'SUCCESS' : 'FAILED'} for ${key}`);
 
         return list;
     }

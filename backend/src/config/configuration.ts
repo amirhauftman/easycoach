@@ -12,7 +12,7 @@ export default () => ({
     token: process.env.API_TOKEN ?? '',
   },
   cache: {
-    ttl: parseInt(process.env.CACHE_TTL ?? '300', 10),
+    ttl: parseInt(process.env.CACHE_TTL ?? '1800000', 10), // 30 minutes in milliseconds
   },
   frontend: {
     url: process.env.FRONTEND_URL ?? 'http://localhost:5173',
