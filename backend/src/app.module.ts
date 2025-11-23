@@ -4,26 +4,24 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import configuration from './config/configuration';
-import { createTypeOrmOptions } from './config/typeorm.config';
 import { MatchesModule } from './modules/matches/matches.module';
 import { PlayersModule } from './modules/players/players.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-const shouldUseTypeOrm = !!process.env.DATABASE_HOST;
-const typeOrmImport = shouldUseTypeOrm
-  ? [
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => createTypeOrmOptions(config),
-    }),
-  ]
-  : [];
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    ...typeOrmImport,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'Amir1996',
+      database: 'easy',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true, // Set to false in production!
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],

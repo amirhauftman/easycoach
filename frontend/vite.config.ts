@@ -6,6 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
       '/cloudfront': {
         target: 'https://dn3dopmbo1yw3.cloudfront.net',
         changeOrigin: true,
