@@ -1,8 +1,6 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
 import { EasyCoachApiService } from './easycoach-api.service';
 import { Match } from './entities/match.entity';
 import { Player } from '../players/entities/player.entity';
@@ -16,7 +14,6 @@ export class MatchesService {
         @InjectRepository(Match)
         private readonly matchRepository: Repository<Match>,
         private readonly api: EasyCoachApiService,
-        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     ) { }
 
     async getAllMatches() {
