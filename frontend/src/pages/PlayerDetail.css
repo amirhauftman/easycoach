@@ -7,8 +7,7 @@
 
 /* Full-width header section */
 .player-header-section {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
+    width: 100%;
     background: linear-gradient(135deg,
             rgba(91, 140, 255, 0.1) 0%,
             rgba(91, 140, 255, 0.05) 50%,
@@ -23,6 +22,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
+    box-sizing: border-box;
 }
 
 /* Content wrapper */
