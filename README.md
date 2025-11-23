@@ -4,6 +4,15 @@ Lightweight sports analytics demo (EasyCoach) — a monorepo with a NestJS backe
 
 This repository contains a simple full-stack example that integrates with the EasyCoach analytics API, exposes a small REST backend, and a React frontend that displays matches and player information.
 
+## Features
+
+- **Match Analytics**: Browse and view detailed match information, including events, timelines, and statistics.
+- **Player Profiles**: Explore comprehensive player data, match history, skill radars, and performance metrics.
+- **Video Playback**: Integrated video player for match footage with controls and event synchronization.
+- **Team Lineups**: Display starting lineups, substitutions, and team formations.
+- **Responsive Design**: Modern React UI built with TypeScript and Vite for fast, scalable development.
+- **API Integration**: Seamless integration with EasyCoach analytics API for real-time data.
+
 ## Quick start
 
 Prerequisites:

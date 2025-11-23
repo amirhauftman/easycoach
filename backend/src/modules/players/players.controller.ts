@@ -1,6 +1,8 @@
 import { Controller, Get, Param, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PlayersService } from './players.service';
 
+@ApiTags('players')
 @Controller('players')
 export class PlayersController {
     constructor(private readonly playersService: PlayersService) { }

@@ -3,24 +3,27 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
-import configuration from './config/configuration';
+import configuration, { validationSchema } from './config/configuration';
+import { createTypeOrmOptions } from './config/typeorm.config';
 import { MatchesModule } from './modules/matches/matches.module';
 import { PlayersModule } from './modules/players/players.module';
+import { HealthModule } from './modules/health/health.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'Amir1996',
-      database: 'easy',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Set to false in production!
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      validationSchema,
+      validationOptions: {
+        abortEarly: false,
+      },
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: createTypeOrmOptions,
     }),
     CacheModule.registerAsync({
       isGlobal: true,
@@ -34,6 +37,7 @@ import { AppService } from './app.service';
     HttpModule.register({ timeout: 10000 }),
     MatchesModule,
     PlayersModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,98 +1,141 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# EasyCoach Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API for EasyCoach, a comprehensive soccer/football match analysis and player performance tracking platform built with NestJS and TypeORM.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Overview
 
-## Description
+The EasyCoach backend provides REST APIs for:
+- **Match Management**: Create, retrieve, and manage match data
+- **Player Management**: Track player information, statistics, and performance metrics
+- **Match Events**: Record and analyze in-game events (goals, fouls, substitutions, etc.)
+- **Team Lineups**: Manage starting lineups and substitutions
+- **Video Analysis**: Support match video processing and playback with event synchronization
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## Project Setup
 
 ```bash
-$ npm install
+# Install dependencies
+npm install
+
+# Create .env file (copy from .env.example)
+cp .env.example .env
 ```
 
-## Compile and run the project
+## Environment Configuration
+
+See `.env.example` for required environment variables:
+- `DB_HOST`, `DB_PORT`, `DB_NAME`: MySQL database configuration
+- `DB_USERNAME`, `DB_PASSWORD`: Database credentials
+
+## Development
 
 ```bash
-# development
-$ npm run start
+# Start dev server with hot reload
+npm run start:dev
 
-# watch mode
-$ npm run start:dev
+# Start in watch mode
+npm run start
 
-# production mode
-$ npm run start:prod
+# Production build
+npm run build
+
+# Production run
+npm run start:prod
 ```
 
-## Run tests
+## Testing
 
 ```bash
-# unit tests
-$ npm run test
+# Unit tests
+npm run test
 
-# e2e tests
-$ npm run test:e2e
+# E2E tests
+npm run test:e2e
 
-# test coverage
-$ npm run test:cov
+# Test coverage
+npm run test:cov
 ```
 
-## Deployment
+## Project Structure
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```
+src/
+├── modules/
+│   ├── matches/          # Match-related controllers, services, DTOs, entities
+│   ├── players/          # Player management
+│   └── [other-modules]/  # Additional feature modules
+├── config/               # Configuration files
+│   ├── configuration.ts  # App configuration
+│   └── typeorm.config.ts # Database configuration
+├── migrations/           # Database migrations
+└── main.ts              # Application entry point
+```
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Key Features
+
+### Match Management
+- CRUD operations for matches
+- Home/away team information
+- Match metadata (date, venue, duration)
+- Event tracking and analysis
+
+### Player Management
+- Player profiles with statistics
+- Performance metrics
+- Match history
+- Skill ratings and comparisons
+
+### Match Events
+- Real-time event logging
+- Event types: goals, assists, fouls, substitutions, cards
+- Timestamp and player tracking
+- Event analytics
+
+### Database
+- MySQL with TypeORM ORM
+- Automated migrations for schema management
+- Normalized data structure for scalability
+
+## API Documentation
+
+API endpoints are structured as follows:
+
+- `GET /api/matches` - List all matches
+- `GET /api/matches/:id` - Get match details
+- `GET /api/players/:id` - Get player information
+- `GET /api/players/:id/matches` - Get player's match history
+- `GET /api/matches/:id/events` - Get match events
+
+## Common Commands
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Run migrations
+npm run typeorm migration:run
+
+# Generate migration
+npm run typeorm migration:generate -- -n MigrationName
+
+# Revert migration
+npm run typeorm migration:revert
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Technologies
 
-## Resources
+- **Framework**: NestJS
+- **Database**: MySQL + TypeORM
+- **Language**: TypeScript
+- **Testing**: Jest
+- **API Style**: RESTful
 
-Check out a few resources that may come in handy when working with NestJS:
+## Contributing
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1. Follow the established module structure
+2. Create DTOs for request/response payloads
+3. Implement service layer logic
+4. Add unit tests for services
+5. Document API endpoints
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Proprietary - EasyCoach Project
+

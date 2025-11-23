@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Param, Query, Body, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { MatchesService } from './matches.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 
+@ApiTags('matches')
 @Controller('matches')
 export class MatchesController {
     private readonly logger = new Logger(MatchesController.name);
@@ -9,6 +11,8 @@ export class MatchesController {
     constructor(private readonly matchesService: MatchesService) { }
 
     @Get()
+    @ApiOperation({ summary: 'Get all matches' })
+    @ApiResponse({ status: 200, description: 'Returns all matches from database' })
     async getMatches() {
         this.logger.log('GET /matches - Fetching all matches from database');
         return this.matchesService.getAllMatches();
