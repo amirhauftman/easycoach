@@ -19,7 +19,7 @@ export class EasyCoachApiService {
         try {
             const { data } = await firstValueFrom(
                 this.http.get(`${this.baseUrl}/league`, {
-                    params: { league_id: leagueId, season_id: seasonId, user_token: this.token },
+                    params: { league_id: leagueId, season_id: seasonId, token: this.token },
                 }),
             );
             return data;
@@ -32,7 +32,7 @@ export class EasyCoachApiService {
         try {
             const { data } = await firstValueFrom(
                 this.http.get(`${this.baseUrl}/match`, {
-                    params: { match_id: matchId, user_token: this.token },
+                    params: { match_id: matchId, token: this.token },
                 }),
             );
             return data;

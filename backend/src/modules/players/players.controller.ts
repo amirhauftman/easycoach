@@ -16,4 +16,9 @@ export class PlayersController {
         if (!p) throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
         return p;
     }
+
+    @Get(':id/matches')
+    async getPlayerMatches(@Param('id') id: string) {
+        return this.playersService.getPlayerMatches(id);
+    }
 }
