@@ -22,14 +22,19 @@ const getTeamLogo = (team: string, type: 'home' | 'away') => {
 };
 
 
-export const MatchList: React.FC<Props> = ({ matchesByDate, total }) => {
+export const MatchList: React.FC<Props> = ({ matchesByDate }) => {
     const navigate = useNavigate();
-    // Flatten all matches from input
+    // Flatten all matches from input and filter for only matches with video
     const flat = useMemo(() => {
         const out: any[] = [];
         Object.values(matchesByDate ?? {}).forEach((matches) => {
             const items = Array.isArray(matches) ? matches : Object.values(matches ?? {})
-            items.forEach((m: any) => out.push(m));
+            items.forEach((m: any) => {
+                // Only include matches that have video available (pxlt_game_id or video_url)
+                if (m.pxlt_game_id || m.video_url || m.video?.normal_hls) {
+                    out.push(m);
+                }
+            });
         });
         return out;
     }, [matchesByDate]);
@@ -133,7 +138,7 @@ export const MatchList: React.FC<Props> = ({ matchesByDate, total }) => {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div className="muted">Total matches: {total}</div>
+                <div className="muted">Matches with video: {allMatches.length}</div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <label className="muted">Per page:</label>
                     <span className="select-wrapper">
@@ -217,7 +222,7 @@ export const MatchList: React.FC<Props> = ({ matchesByDate, total }) => {
             })}
 
             <div className="pagination" style={{ marginTop: 12 }}>
-                <Pagination total={total} pageSize={size} page={page} onPageChange={(p) => setPage(Math.max(1, Math.min(Math.ceil(total / size || 1), p)))} />
+                <Pagination total={allMatches.length} pageSize={size} page={page} onPageChange={(p) => setPage(Math.max(1, Math.min(Math.ceil(allMatches.length / size || 1), p)))} />
             </div>
         </div>
     );
