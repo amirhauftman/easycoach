@@ -1,8 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import VideoPlayer from '../components/video/VideoPlayer';
+import { useAppStore } from '../stores/useAppStore';
+import type { BreadcrumbItem } from '../components/common/Breadcrumb';
 
 export const VideoPage: React.FC = () => {
+    const { matchId } = useParams<{ matchId: string }>();
+    const { setBreadcrumbs } = useAppStore();
     const [url, setUrl] = useState<string | undefined>(undefined);
+
+    // Set breadcrumbs for video page
+    useEffect(() => {
+        const breadcrumbs: BreadcrumbItem[] = [
+            { label: 'Home', path: '/', icon: '🏠' },
+            { label: 'Matches', path: '/matches', icon: '⚽' }
+        ];
+
+        if (matchId) {
+            breadcrumbs.push(
+                { label: 'Match Detail', path: `/matches/${matchId}`, icon: '🏆' },
+                { label: 'Video', icon: '🎥', isActive: true }
+            );
+        } else {
+            breadcrumbs.push({ label: 'Video', icon: '🎥', isActive: true });
+        }
+
+        setBreadcrumbs(breadcrumbs);
+
+        return () => setBreadcrumbs([]);
+    }, [matchId, setBreadcrumbs]);
 
     return (
         <div className="content-panel">
