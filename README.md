@@ -17,7 +17,7 @@ This repository contains a simple full-stack example that integrates with the Ea
 
 Prerequisites:
 - Node.js 18+ and npm
-- (Optional) Docker & docker-compose for local DB
+- PostgreSQL database (local or remote)
 
 1) Install dependencies for both apps
 
@@ -42,13 +42,12 @@ The backend listens on port `3000` by default and the frontend Vite dev server u
 
 ## Environment
 
-See `backend/.env.example` and `frontend/.env.example` for environment variables the apps use. Important backend vars:
+Environment variables are configured in `.env` files (not committed to git). Important backend vars:
 
-- `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME` — MySQL connection
+- `DATABASE_URL` — Complete PostgreSQL connection string
 - `API_BASE_URL`, `API_TOKEN` — EasyCoach remote API base and token
 - `CACHE_TTL` — cache TTL for backend cache manager
-
-When running with Docker, the provided `docker-compose.yml` can be used to start a local MySQL instance.
+- `FRONTEND_URL` — Frontend URL for CORS configuration
 
 ## Build & tests
 
@@ -59,9 +58,9 @@ When running with Docker, the provided `docker-compose.yml` can be used to start
 
 ## Project structure (high level)
 
-- `backend/` — NestJS API, modules under `backend/src/modules/` (matches, players, etc.), TypeORM entities and migrations in `backend/src/migrations/`.
-- `frontend/` — React + TypeScript app, components under `frontend/src/components/`, pages under `frontend/src/pages/`, API calls in `frontend/src/services/api.ts`.
-- `github/` — project docs and agent guidance.
+- `backend/` — NestJS API, modules under `backend/src/modules/` (health, matches, players), TypeORM entities and migrations in `backend/src/migrations/`.
+- `frontend/` — React + TypeScript app, components under `frontend/src/components/`, pages under `frontend/src/pages/`, API calls in `frontend/src/services/easycoach-api.ts`.
+- `.github/` — project docs and agent guidance.
 
 ## Development notes
 
@@ -71,14 +70,14 @@ When running with Docker, the provided `docker-compose.yml` can be used to start
 
 ## Troubleshooting
 
-- If the backend cannot connect to MySQL, verify `DATABASE_*` env vars and check Docker container status.
-- If the frontend cannot reach the backend in dev, confirm `VITE_API_URL` in `frontend/.env` and that the backend is running on `http://localhost:3000`.
+- If the backend cannot connect to PostgreSQL, verify `DATABASE_URL` in `backend/.env`.
+- If the frontend cannot reach the backend in dev, confirm the backend is running on `http://localhost:3000` and CORS is configured properly.
 
 ## Want more?
 
 I can:
 - Wire the new components into `App.tsx` and add basic routing
 - Add Jest tests for critical components and services
-- Add Docker Compose examples for local development
+- Add additional database migrations and entity relationships
 
 Open an issue or tell me which of the above you'd like me to do next.

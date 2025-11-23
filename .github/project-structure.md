@@ -1,165 +1,180 @@
-easycoach-app/
-├── .copilot/
-│   ├── instructions.md              # Main Copilot instructions
-│   ├── prd.md                       # Product Requirements Document
-│   ├── api-agent.md                 # API development instructions
-│   ├── ui-agent.md                  # Frontend development instructions
-│   ├── backend-agent.md             # Backend architecture instructions
-│   ├── testing-agent.md             # Testing instructions
-│   └── architecture-agent.md        # System architecture docs
+easycoach/
+├── .github/
+│   ├── copilot-instructions.md      # Main Copilot instructions
+│   ├── PRD.md                       # Product Requirements Document
+│   ├── backend-architecture.md      # Backend architecture instructions
+│   ├── project-instruction.md       # Project instructions
+│   ├── project-structure.md         # This file - project structure
+│   └── test-instruction.md          # Testing instructions
 │
 ├── backend/
 │   ├── src/
 │   │   ├── common/
-│   │   │   ├── decorators/
-│   │   │   ├── filters/
-│   │   │   │   └── http-exception.filter.ts
-│   │   │   ├── interceptors/
-│   │   │   │   ├── transform.interceptor.ts
-│   │   │   │   └── logging.interceptor.ts
-│   │   │   ├── pipes/
-│   │   │   └── guards/
+│   │   │   └── filters/
+│   │   │       └── all-exceptions.filter.ts
 │   │   │
 │   │   ├── config/
 │   │   │   ├── configuration.ts
 │   │   │   └── typeorm.config.ts
 │   │   │
 │   │   ├── modules/
+│   │   │   ├── health/
+│   │   │   │   ├── health.controller.ts
+│   │   │   │   └── health.module.ts
+│   │   │   │
 │   │   │   ├── matches/
 │   │   │   │   ├── matches.module.ts
 │   │   │   │   ├── matches.controller.ts
-│   │   │   │   ├── matches.controller.spec.ts
 │   │   │   │   ├── matches.service.ts
-│   │   │   │   ├── matches.service.spec.ts
 │   │   │   │   ├── easycoach-api.service.ts
-│   │   │   │   └── dto/
-│   │   │   │       └── match-query.dto.ts
+│   │   │   │   ├── dto/
+│   │   │   │   │   ├── create-match.dto.ts
+│   │   │   │   │   └── update-match.dto.ts
+│   │   │   │   └── entities/
+│   │   │   │       ├── match.entity.ts
+│   │   │   │       └── match-event.entity.ts
 │   │   │   │
 │   │   │   └── players/
 │   │   │       ├── players.module.ts
 │   │   │       ├── players.controller.ts
-│   │   │       ├── players.controller.spec.ts
 │   │   │       ├── players.service.ts
-│   │   │       ├── players.service.spec.ts
-│   │   │       ├── entities/
-│   │   │       │   └── player-skills.entity.ts
-│   │   │       └── dto/
-│   │   │           ├── create-player-skills.dto.ts
-│   │   │           └── update-player-skills.dto.ts
+│   │   │       ├── easycoach-players-api.service.ts
+│   │   │       └── entities/
+│   │   │           ├── player.entity.ts
+│   │   │           └── player-stat.entity.ts
 │   │   │
 │   │   ├── migrations/
-│   │   │   └── 1700000000000-CreatePlayerSkills.ts
+│   │   │   └── README.md
 │   │   │
+│   │   ├── app.controller.ts
+│   │   ├── app.controller.spec.ts
 │   │   ├── app.module.ts
+│   │   ├── app.service.ts
+│   │   ├── data-source.ts
 │   │   └── main.ts
+│   │
+│   ├── scripts/
+│   │   ├── enrich-matches.ts
+│   │   └── seed-matches.ts
 │   │
 │   ├── test/
 │   │   ├── app.e2e-spec.ts
-│   │   ├── matches.e2e-spec.ts
-│   │   └── players.e2e-spec.ts
+│   │   └── jest-e2e.json
 │   │
-│   ├── .env.example
-│   ├── .eslintrc.js
+│   ├── .env
+│   ├── .gitignore
 │   ├── .prettierrc
+│   ├── BEST_PRACTICES_SUMMARY.md
+│   ├── CHECKLIST.md
+│   ├── eslint.config.mjs
 │   ├── nest-cli.json
 │   ├── package.json
-│   ├── tsconfig.json
-│   ├── jest.config.js
-│   └── Dockerfile
+│   ├── README.md
+│   ├── tsconfig.build.json
+│   └── tsconfig.json
 │
 ├── frontend/
 │   ├── public/
-│   │   └── vite.svg
+│   │   ├── assets/
+│   │   ├── data/
+│   │   │   ├── match-1061429.json
+│   │   │   └── matches.json
+│   │   └── breakdown_game_1061429_league_726.json
 │   │
 │   ├── src/
 │   │   ├── assets/
 │   │   │
 │   │   ├── components/
 │   │   │   ├── common/
+│   │   │   │   ├── Breadcrumb.tsx
+│   │   │   │   ├── Breadcrumb.css
 │   │   │   │   ├── Button.tsx
+│   │   │   │   ├── Button.test.tsx
 │   │   │   │   ├── Card.tsx
-│   │   │   │   ├── Loading.tsx
+│   │   │   │   ├── ErrorBoundary.tsx
 │   │   │   │   ├── ErrorMessage.tsx
-│   │   │   │   └── ErrorBoundary.tsx
+│   │   │   │   ├── Loading.tsx
+│   │   │   │   ├── Pagination.tsx
+│   │   │   │   ├── Skeleton.tsx
+│   │   │   │   ├── Toast.tsx
+│   │   │   │   ├── Toast.css
+│   │   │   │   └── ToastContainer.tsx
+│   │   │   │
+│   │   │   ├── layout/
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   ├── Header.tsx
+│   │   │   │   └── Header.css
 │   │   │   │
 │   │   │   ├── matches/
-│   │   │   │   ├── MatchCard.tsx
-│   │   │   │   ├── MatchCard.test.tsx
-│   │   │   │   ├── MatchList.tsx
-│   │   │   │   ├── LineupTab.tsx
 │   │   │   │   ├── EventsTab.tsx
-│   │   │   │   └── EventTimeline.tsx
+│   │   │   │   ├── EventTimeline.tsx
+│   │   │   │   ├── LineupTab.tsx
+│   │   │   │   ├── MatchCard.tsx
+│   │   │   │   ├── MatchList.tsx
+│   │   │   │   └── TeamLineup.tsx
 │   │   │   │
 │   │   │   ├── players/
+│   │   │   │   ├── MatchesList.tsx
+│   │   │   │   ├── MatchesList.css
+│   │   │   │   ├── MatchHistory.tsx
 │   │   │   │   ├── PlayerCard.tsx
 │   │   │   │   ├── PlayerHeader.tsx
 │   │   │   │   ├── SkillRadar.tsx
-│   │   │   │   ├── SkillRadar.test.tsx
-│   │   │   │   └── MatchHistory.tsx
+│   │   │   │   └── __tests__/
+│   │   │   │       ├── MatchesList.test.tsx
+│   │   │   │       ├── PlayerHeader.test.tsx
+│   │   │   │       └── SkillRadar.test.tsx
 │   │   │   │
-│   │   │   ├── video/
-│   │   │   │   ├── VideoPlayer.tsx
-│   │   │   │   └── VideoControls.tsx
-│   │   │   │
-│   │   │   └── layout/
-│   │   │       ├── Header.tsx
-│   │   │       ├── Sidebar.tsx
-│   │   │       └── Footer.tsx
-│   │   │
-│   │   ├── pages/
-│   │   │   ├── MatchesPage.tsx
-│   │   │   ├── MatchDetailsPage.tsx
-│   │   │   └── PlayerPage.tsx
+│   │   │   └── video/
+│   │   │       ├── MatchEventPlayer.tsx
+│   │   │       ├── MatchPlayer.tsx
+│   │   │       ├── VideoControls.tsx
+│   │   │       └── VideoPlayer.tsx
 │   │   │
 │   │   ├── hooks/
-│   │   │   ├── useMatches.ts
-│   │   │   ├── useMatches.test.ts
-│   │   │   ├── useMatchDetails.ts
-│   │   │   ├── usePlayerSkills.ts
-│   │   │   └── useUpdatePlayerSkills.ts
+│   │   │   ├── useMatchDetail.ts
+│   │   │   ├── useQueries.ts
+│   │   │   ├── useToast.ts
+│   │   │   └── USAGE_EXAMPLES.tsx
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── MatchDetail.tsx
+│   │   │   ├── MatchesPage.tsx
+│   │   │   ├── PlayerDetail.tsx
+│   │   │   ├── PlayerDetail.css
+│   │   │   └── VideoPage.tsx
+│   │   │
+│   │   ├── services/
+│   │   │   └── easycoach-api.ts
 │   │   │
 │   │   ├── stores/
 │   │   │   └── useAppStore.ts
 │   │   │
-│   │   ├── services/
-│   │   │   ├── api.ts
-│   │   │   └── queries.ts
-│   │   │
-│   │   ├── types/
-│   │   │   ├── match.types.ts
-│   │   │   ├── player.types.ts
-│   │   │   └── index.ts
-│   │   │
-│   │   ├── utils/
-│   │   │   ├── formatters.ts
-│   │   │   ├── validators.ts
-│   │   │   └── constants.ts
+│   │   ├── test/
+│   │   │   └── setup.ts
 │   │   │
 │   │   ├── App.tsx
 │   │   ├── App.css
-│   │   ├── main.tsx
 │   │   ├── index.css
-│   │   └── vite-env.d.ts
+│   │   ├── main.tsx
+│   │   ├── setupTests.ts
+│   │   └── types.ts
 │   │
-│   ├── __tests__/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   └── utils/
-│   │
-│   ├── .env.example
-│   ├── .eslintrc.cjs
+│   ├── .env
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── FRONTEND_IMPROVEMENTS.md
 │   ├── index.html
 │   ├── package.json
+│   ├── README.md
+│   ├── tsconfig.app.json
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   ├── vite.config.ts
-│   ├── tailwind.config.js
-│   ├── postcss.config.js
-│   ├── jest.config.js
-│   ├── setupTests.ts
-│   └── Dockerfile
+│   └── vitest.config.ts
 │
-├── docker-compose.yml
+├── .env
+├── .env.docker
 ├── .gitignore
-├── README.md
-└── SETUP.md
+├── breakdown_game_1061429_league_726.json
+└── README.md

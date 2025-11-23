@@ -7,7 +7,7 @@ Full-stack sports analytics application integrating with EasyCoach API to displa
 - **Frontend**: React 18, TypeScript, TanStack Query, Zustand, Zod
 - **Backend**: NestJS, TypeORM, MySQL
 - **Testing**: Jest, React Testing Library, Supertest
-- **DevOps**: Docker, Docker Compose
+- **DevOps**: Currently using local development setup (no Docker files)
 
 ## Architecture Principles
 1. **Separation of Concerns**: Clear separation between API, business logic, and data layers
@@ -18,40 +18,42 @@ Full-stack sports analytics application integrating with EasyCoach API to displa
 
 ## File Structure
 ```
-easycoach-app/
+easycoach/
 ├── backend/
 │   ├── src/
 │   │   ├── modules/
+│   │   │   ├── health/
 │   │   │   ├── matches/
-│   │   │   ├── players/
-│   │   │   └── cache/
+│   │   │   └── players/
 │   │   ├── common/
-│   │   │   ├── decorators/
-│   │   │   ├── filters/
-│   │   │   ├── interceptors/
-│   │   │   └── pipes/
-│   │   └── config/
-│   ├── test/
-│   └── Dockerfile
+│   │   │   └── filters/
+│   │   ├── config/
+│   │   ├── migrations/
+│   │   └── [app files]
+│   ├── scripts/
+│   └── test/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
+│   │   │   ├── common/
+│   │   │   ├── layout/
+│   │   │   ├── matches/
+│   │   │   ├── players/
+│   │   │   └── video/
 │   │   ├── pages/
-│   │   ├── stores/
 │   │   ├── hooks/
+│   │   ├── stores/
 │   │   ├── services/
-│   │   └── types/
-│   ├── __tests__/
-│   └── Dockerfile
-├── .copilot/
-│   ├── instructions.md
-│   ├── api-agent.md
-│   ├── ui-agent.md
-│   ├── backend-agent.md
-│   ├── architecture-agent.md
-│   ├── testing-agent.md
-│   └── prd.md
-└── docker-compose.yml
+│   │   └── test/
+│   └── public/
+├── .github/
+│   ├── copilot-instructions.md
+│   ├── project-instruction.md
+│   ├── project-structure.md
+│   ├── PRD.md
+│   ├── backend-architecture.md
+│   └── test-instruction.md
+└── [root config files]
 ```
 
 ## Naming Conventions

@@ -673,51 +673,19 @@ export { customRender as render };
 
 ## Jest Configuration
 
-### Backend jest.config.js
+### Backend Testing Configuration
 
-```javascript
-module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['<rootDir>/src', '<rootDir>/test'],
-  testMatch: ['**/*.spec.ts', '**/*.e2e-spec.ts'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.interface.ts',
-    '!src/**/*.module.ts',
-    '!src/main.ts',
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
-    },
-  },
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
-};
-```
+Jest is configured in `backend/package.json`:
+- Uses ts-jest preset for TypeScript
+- Node environment for backend testing
+- Test files: `*.spec.ts` for unit tests, `*.e2e-spec.ts` for e2e tests
 
-### Frontend jest.config.js
+### Frontend Testing Configuration
 
-```javascript
-module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
-  moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
-  collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/main.tsx',
-    '!src/vite-env.d.ts',
-  ],
+Using Vitest (configured in `vitest.config.ts`):
+- jsdom environment for DOM testing  
+- Setup file: `src/setupTests.ts`
+- Uses React Testing Library for component testing
   coverageThreshold: {
     global: {
       branches: 70,

@@ -10,9 +10,9 @@ Quick reference for AI coding agents to be productive in this repo.
 ## Where to look first (examples)
 - Backend boot: `backend/src/main.ts`, `backend/src/app.module.ts`, `backend/src/config/configuration.ts`.
 - Typical module: `backend/src/modules/<feature>/<feature>.module.ts` with `*.controller.ts`, `*.service.ts`, `dto/` and `entities/`.
-- Frontend entry: `frontend/src/main.tsx`, `frontend/src/App.tsx`, `frontend/src/services/api.ts`.
-- Tests: `*.spec.ts` files live alongside code (`backend/src/modules/**/*.spec.ts`, `frontend/src/components/**/*.test.tsx`).
-- Repo-level agent docs: `github/project-instruction.md` and `github/project-structure.md` (use these as canonical guidance to merge into any generated content).
+- Frontend entry: `frontend/src/main.tsx`, `frontend/src/App.tsx`, `frontend/src/services/easycoach-api.ts`.
+- Tests: `*.spec.ts` files for backend, `*.test.tsx` files for frontend components in `__tests__` subdirectories.
+- Repo-level agent docs: `.github/project-instruction.md` and `.github/project-structure.md` (use these as canonical guidance to merge into any generated content).
 
 ## Build / Run / Test (exact commands)
 - Backend (from repo root):
@@ -43,11 +43,11 @@ Quick reference for AI coding agents to be productive in this repo.
 
 ## Integration & infra notes
 - Backend uses TypeORM (`typeorm` package) and stores migrations in `backend/src/migrations/` — prefer repository migrations for schema changes.
-- DB is MySQL (see `backend/.env.example` and `backend/README.md`). Local dev commonly uses Docker (top-level `docker-compose.yml` referenced in docs).
+- DB is MySQL configured via `DATABASE_URL` in `backend/.env`. See `backend/README.md` for more details.
 
 ## Helpful examples to reference in prompts
 - Use `backend/src/modules/matches/*` as the canonical backend module example (controller/service/DTO/tests).
-- Use `frontend/src/components/matches/MatchCard.tsx` and `frontend/src/hooks/useMatches.ts` as canonical React + data-fetch examples.
+- Use `frontend/src/components/matches/MatchCard.tsx` and `frontend/src/hooks/useMatchDetail.ts` as canonical React + data-fetch examples.
 
 ## What to avoid / assumptions not to make
 - Do not change global repo structure (move folders) without explicit user approval.
@@ -62,4 +62,4 @@ Quick reference for AI coding agents to be productive in this repo.
 - If behaviour or API contract is unclear, point to `github/project-instruction.md` and open an issue or ask the repo owner for business logic clarification.
 
 ---
-If anything here is unclear or you want more detail for specific tasks (e.g., migration workflow, docker-compose setup, or CI commands), tell me which area to expand.
+If anything here is unclear or you want more detail for specific tasks (e.g., migration workflow, testing setup, or environment configuration), tell me which area to expand.
