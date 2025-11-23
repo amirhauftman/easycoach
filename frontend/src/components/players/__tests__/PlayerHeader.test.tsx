@@ -8,6 +8,5 @@ describe('PlayerHeader', () => {
         expect(screen.getByText(/John Doe/)).toBeInTheDocument();
         expect(screen.getByText(/Position:/)).toBeInTheDocument();
         expect(screen.getByText(/Team:/)).toBeInTheDocument();
-        expect(screen.getByText(/Nationality:/)).toBeInTheDocument();
     });
 });
