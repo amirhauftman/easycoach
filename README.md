@@ -1,10 +1,14 @@
 # EasyCoach
 
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
+
 Lightweight sports analytics demo (EasyCoach) — a monorepo with a NestJS backend and a React + Vite frontend.
 
 This repository contains a simple full-stack example that integrates with the EasyCoach analytics API, exposes a small REST backend, and a React frontend that displays matches and player information.
 
-## Features
+## 🚀 Features
 
 - **Match Analytics**: Browse and view detailed match information, including events, timelines, and statistics.
 - **Player Profiles**: Explore comprehensive player data, match history, skill radars, and performance metrics.
@@ -12,72 +16,140 @@ This repository contains a simple full-stack example that integrates with the Ea
 - **Team Lineups**: Display starting lineups, substitutions, and team formations.
 - **Responsive Design**: Modern React UI built with TypeScript and Vite for fast, scalable development.
 - **API Integration**: Seamless integration with EasyCoach analytics API for real-time data.
+- **Health Checks**: Built-in endpoints for monitoring backend health and database connectivity.
+- **API Documentation**: Interactive Swagger/OpenAPI docs at `/api/docs`.
 
-## Quick start
+## 🏗️ Architecture
 
-Prerequisites:
+- **Backend**: NestJS API with TypeORM and PostgreSQL, modules for matches, players.
+- **Frontend**: React + TypeScript app with Vite, Zustand for global state, TanStack Query for server state.
+- **Database**: PostgreSQL with TypeORM migrations.
+- **Testing**: Jest for backend, Vitest for frontend components.
+
+## 📋 Prerequisites
+
 - Node.js 18+ and npm
 - PostgreSQL database (local or remote)
 
-1) Install dependencies for both apps
+## ⚡ Quick Start
 
-```powershell
-cd backend; npm install
-cd ..\frontend; npm install
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/amirhauftman/easycoach.git
+   cd easycoach
+   ```
 
-2) Run backend in development (watch)
+2. **Install dependencies**
+   ```powershell
+   cd backend; npm install
+   cd ..\frontend; npm install
+   ```
 
-```powershell
-cd backend; npm run start:dev
-```
+3. **Set up environment variables**
+   - Copy `backend/.env.example` to `backend/.env`
+   - Copy `frontend/.env.example` to `frontend/.env`
+   - Update the values as needed (see Environment section below)
 
-3) Run frontend (Vite) in development
+4. **Run the backend**
+   ```powershell
+   cd backend; npm run start:dev
+   ```
 
-```powershell
-cd frontend; npm run dev
-```
+5. **Run the frontend** (in a new terminal)
+   ```powershell
+   cd frontend; npm run dev
+   ```
 
 The backend listens on port `3000` by default and the frontend Vite dev server uses port `5173`.
 
-## Environment
+Visit `http://localhost:5173` to access the application.
 
-Environment variables are configured in `.env` files (not committed to git). Important backend vars:
+## 🔧 Environment Variables
 
-- `DATABASE_URL` — Complete PostgreSQL connection string
+Environment variables are configured in `.env` files (not committed to git).
+
+### Backend (`.env`)
+- `DATABASE_URL` — Complete PostgreSQL connection string (e.g., `postgresql://user:password@localhost:5432/dbname`)
 - `API_BASE_URL`, `API_TOKEN` — EasyCoach remote API base and token
-- `CACHE_TTL` — cache TTL for backend cache manager
-- `FRONTEND_URL` — Frontend URL for CORS configuration
+- `CACHE_TTL` — Cache TTL for backend cache manager (default: 1800000 ms)
+- `FRONTEND_URL` — Frontend URL for CORS configuration (default: `http://localhost:5173`)
+- `NODE_ENV` — Environment mode (development/production/test)
+- `PORT` — Backend port (default: 3000)
 
-## Build & tests
+### Frontend (`.env`)
+- `VITE_API_BASE_URL` — Backend API base URL (default: `http://localhost:3000`)
 
-- Backend build: `cd backend; npm run build`
-- Frontend build: `cd frontend; npm run build`
-- Backend unit tests: `cd backend; npm run test`
-- Backend e2e tests: `cd backend; npm run test:e2e`
+## 🏃 Build & Test
 
-## Project structure (high level)
+### Backend
+- **Development**: `cd backend; npm run start:dev`
+- **Production build**: `cd backend; npm run build` then `cd backend; npm run start:prod`
+- **Unit tests**: `cd backend; npm run test`
+- **E2E tests**: `cd backend; npm run test:e2e`
 
-- `backend/` — NestJS API, modules under `backend/src/modules/` (health, matches, players), TypeORM entities and migrations in `backend/src/migrations/`.
-- `frontend/` — React + TypeScript app, components under `frontend/src/components/`, pages under `frontend/src/pages/`, API calls in `frontend/src/services/easycoach-api.ts`.
-- `.github/` — project docs and agent guidance.
+### Frontend
+- **Development**: `cd frontend; npm run dev`
+- **Build**: `cd frontend; npm run build`
+- **Preview**: `cd frontend; npm run preview`
+- **Tests**: `cd frontend; npm run test`
 
-## Development notes
+## 📁 Project Structure
 
-- Follow file naming conventions: kebab-case files, PascalCase React components, camelCase functions.
-- Backend uses TypeORM; prefer repository migrations for schema changes.
-- Frontend uses Zustand for global state and TanStack Query for server state.
+```
+easycoach/
+├── backend/                    # NestJS API
+│   ├── src/
+│   │   ├── modules/           # Feature modules (matches, players)
+│   │   ├── config/            # Configuration files
+│   │   └── common/            # Shared utilities
+│   └── test/                  # E2E tests
+├── frontend/                  # React + Vite app
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── pages/             # Page components
+│   │   ├── services/          # API services
+│   │   ├── stores/            # Zustand stores
+│   │   └── hooks/             # Custom React hooks
+│   └── public/                # Static assets
+├── .github/                   # GitHub workflows and docs
+└── README.md
+```
 
-## Troubleshooting
+## 🛠️ Development
 
-- If the backend cannot connect to PostgreSQL, verify `DATABASE_URL` in `backend/.env`.
-- If the frontend cannot reach the backend in dev, confirm the backend is running on `http://localhost:3000` and CORS is configured properly.
+### Conventions
+- **File naming**: kebab-case for files, PascalCase for React components, camelCase for functions/variables.
+- **Backend**: NestJS pattern with modules containing controller, service, DTOs, entities.
+- **Frontend**: Component-driven with typed props, Zustand for global state, TanStack Query for server data.
+- **API calls**: Centralized in `frontend/src/services/easycoach-api.ts` with axios interceptors.
+- **Tests**: Backend uses Jest; frontend uses Vitest.
 
-## Want more?
+## 🔍 API Documentation
 
-I can:
-- Wire the new components into `App.tsx` and add basic routing
-- Add Jest tests for critical components and services
-- Add additional database migrations and entity relationships
+Once the backend is running, visit `http://localhost:3000/api/docs` for interactive Swagger documentation.
 
-Open an issue or tell me which of the above you'd like me to do next.
+## 🐛 Troubleshooting
+
+- **Database connection issues**: Verify `DATABASE_URL` in `backend/.env`.
+- **Frontend can't reach backend**: Ensure backend is running on `http://localhost:3000` and CORS is configured.
+- **Port conflicts**: Change ports in `.env` files if needed.
+- **Build errors**: Ensure Node.js version is 18+ and dependencies are installed.
+- **Tests failing**: Check database setup for e2e tests.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Make your changes and add tests
+4. Run tests: `cd backend; npm run test` and `cd frontend; npm run test`
+5. Commit your changes: `git commit -am 'Add some feature'`
+6. Push to the branch: `git push origin feature/your-feature`
+7. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📞 Support
+
+If you have any questions or issues, please open an issue on GitHub.
