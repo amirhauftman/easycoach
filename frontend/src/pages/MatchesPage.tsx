@@ -60,7 +60,7 @@ const MatchesPage: React.FC = () => {
         <div className="page-container">
             <div className="page-header">
                 <h1>Matches</h1>
-                <p>View all football matches organized by date</p>
+                {/* <p>View all football matches organized by date</p> */}
             </div>
             <MatchList matchesByDate={matchesByDate || {}} total={totalMatches} />
         </div>
