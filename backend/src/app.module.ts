@@ -7,7 +7,6 @@ import configuration, { validationSchema } from './config/configuration';
 import { createTypeOrmOptions } from './config/typeorm.config';
 import { MatchesModule } from './modules/matches/matches.module';
 import { PlayersModule } from './modules/players/players.module';
-import { HealthModule } from './modules/health/health.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -37,9 +36,8 @@ import { AppService } from './app.service';
     HttpModule.register({ timeout: 10000 }),
     MatchesModule,
     PlayersModule,
-    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

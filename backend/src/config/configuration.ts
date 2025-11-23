@@ -6,7 +6,9 @@ export const validationSchema = Joi.object({
     .default('development'),
   PORT: Joi.number().default(3000),
   DATABASE_URL: Joi.string().required(),
-  API_BASE_URL: Joi.string().uri().default('https://ifa.easycoach.club/en/api/v3/analytics'),
+  API_BASE_URL: Joi.string()
+    .uri()
+    .default('https://ifa.easycoach.club/en/api/v3/analytics'),
   API_TOKEN: Joi.string().allow('').default(''),
   CACHE_TTL: Joi.number().default(1800000),
   FRONTEND_URL: Joi.string().uri().default('http://localhost:5173'),
@@ -19,7 +21,9 @@ export default () => ({
     url: process.env.DATABASE_URL,
   },
   api: {
-    baseUrl: process.env.API_BASE_URL ?? 'https://ifa.easycoach.club/en/api/v3/analytics',
+    baseUrl:
+      process.env.API_BASE_URL ??
+      'https://ifa.easycoach.club/en/api/v3/analytics',
     token: process.env.API_TOKEN ?? '',
   },
   cache: {

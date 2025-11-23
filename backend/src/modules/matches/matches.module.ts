@@ -8,12 +8,9 @@ import { Match } from './entities/match.entity';
 import { MatchEvent } from './entities/match-event.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Match, MatchEvent]),
-    HttpModule
-  ],
+  imports: [TypeOrmModule.forFeature([Match, MatchEvent]), HttpModule],
   controllers: [MatchesController],
   providers: [MatchesService, EasyCoachApiService],
   exports: [MatchesService],
 })
-export class MatchesModule { }
+export class MatchesModule {}

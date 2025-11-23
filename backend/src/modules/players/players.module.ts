@@ -8,12 +8,9 @@ import { Player } from './entities/player.entity';
 import { PlayerStat } from './entities/player-stat.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Player, PlayerStat]),
-    HttpModule
-  ],
+  imports: [TypeOrmModule.forFeature([Player, PlayerStat]), HttpModule],
   controllers: [PlayersController],
   providers: [PlayersService, EasyCoachPlayersApiService],
   exports: [PlayersService],
 })
-export class PlayersModule { }
+export class PlayersModule {}
