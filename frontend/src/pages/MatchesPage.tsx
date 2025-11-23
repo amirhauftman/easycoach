@@ -57,12 +57,26 @@ const MatchesPage: React.FC = () => {
     }
 
     return (
-        <div className="page-container">
-            <div className="page-header">
-                <h1>Matches</h1>
-                {/* <p>View all football matches organized by date</p> */}
+        <div
+            className="page-container"
+            style={{
+                width: '100%',
+                maxWidth: '1200px',
+                margin: '0 auto',
+                padding: '0',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'stretch'
+            }}
+        >
+            <div className="page-header" style={{ width: '100%', textAlign: 'center', marginBottom: '2rem' }}>
+                <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', fontWeight: '700' }}>Matches</h1>
             </div>
-            <MatchList matchesByDate={matchesByDate || {}} total={totalMatches} />
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ width: '100%', maxWidth: '1000px' }}>
+                    <MatchList matchesByDate={matchesByDate || {}} total={totalMatches} />
+                </div>
+            </div>
         </div>
     );
 };

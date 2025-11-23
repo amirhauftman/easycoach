@@ -71,18 +71,14 @@ export function PlayerPage({ playerId }: { playerId: string }) {
 }
 
 // Example 4: Using Zustand for UI state management
-import { useAppStore, useSidebarOpen, useSelectedMatchId } from '../stores/useAppStore';
+import { useAppStore, useSelectedMatchId } from '../stores/useAppStore';
 
 export function NavigationExample() {
-    const sidebarOpen = useSidebarOpen();
     const selectedMatchId = useSelectedMatchId();
-    const { setSidebarOpen, setSelectedMatchId } = useAppStore();
+    const { setSelectedMatchId } = useAppStore();
 
     return (
         <div>
-            <button onClick={() => setSidebarOpen(!sidebarOpen)}>
-                {sidebarOpen ? 'Close' : 'Open'} Sidebar
-            </button>
             {selectedMatchId && (
                 <p>Currently viewing match: {selectedMatchId}</p>
             )}

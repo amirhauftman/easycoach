@@ -137,8 +137,7 @@ export const MatchList: React.FC<Props> = ({ matchesByDate }) => {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                {/* <div className="muted">Matches with video: {allMatches.length}</div> */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 12 }}>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <label className="muted">Per page:</label>
                     <span className="select-wrapper">

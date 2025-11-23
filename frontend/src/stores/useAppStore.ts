@@ -3,10 +3,6 @@ import { devtools } from 'zustand/middleware';
 import type { BreadcrumbItem } from '../components/common/Breadcrumb';
 
 interface AppState {
-    // UI State
-    sidebarOpen: boolean;
-    theme: 'light' | 'dark';
-
     // User preferences
     preferredVideoQuality: 'auto' | 'high' | 'medium' | 'low';
 
@@ -19,8 +15,6 @@ interface AppState {
     breadcrumbs: BreadcrumbItem[];
 
     // Actions
-    setSidebarOpen: (open: boolean) => void;
-    setTheme: (theme: 'light' | 'dark') => void;
     setPreferredVideoQuality: (quality: 'auto' | 'high' | 'medium' | 'low') => void;
     setSelectedMatchId: (id: string | null) => void;
     setSelectedMatchTitle: (title: string | null) => void;
@@ -34,8 +28,6 @@ interface AppState {
 }
 
 const initialState = {
-    sidebarOpen: false,
-    theme: 'light' as const,
     preferredVideoQuality: 'auto' as const,
     selectedMatchId: null,
     selectedMatchTitle: null,
@@ -48,8 +40,6 @@ export const useAppStore = create<AppState>()(
         (set) => ({
             ...initialState,
 
-            setSidebarOpen: (open) => set({ sidebarOpen: open }),
-            setTheme: (theme) => set({ theme }),
             setPreferredVideoQuality: (quality) => set({ preferredVideoQuality: quality }),
             setSelectedMatchId: (id) => set({ selectedMatchId: id }),
             setSelectedMatchTitle: (title) => set({ selectedMatchTitle: title }),
@@ -69,8 +59,6 @@ export const useAppStore = create<AppState>()(
 );
 
 // Selectors for better performance
-export const useSidebarOpen = () => useAppStore((state) => state.sidebarOpen);
-export const useTheme = () => useAppStore((state) => state.theme);
 export const useSelectedMatchId = () => useAppStore((state) => state.selectedMatchId);
 export const useSelectedMatchTitle = () => useAppStore((state) => state.selectedMatchTitle);
 export const useSelectedPlayerId = () => useAppStore((state) => state.selectedPlayerId);

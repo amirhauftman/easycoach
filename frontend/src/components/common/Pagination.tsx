@@ -22,7 +22,7 @@ const Pagination: React.FC<Props> = ({ total, pageSize, page, onPageChange }) =>
     };
 
     return (
-        <nav aria-label="Pagination Navigation" style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
+        <nav aria-label="Pagination Navigation" style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', marginTop: 12, width: '100%' }}>
             <button
                 onClick={() => onPageChange(1)}
                 onKeyDown={(e) => handleKeyDown(e, () => onPageChange(1))}
