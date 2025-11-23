@@ -78,7 +78,8 @@
 }
 
 .home-team,
-.away-team {
+.away-team,
+.opponent {
     font-weight: 600;
     color: var(--text);
 }
@@ -95,6 +96,11 @@
 .competition-content {
     color: var(--muted);
     font-weight: 500;
+}
+
+.team-content {
+    font-weight: 600;
+    color: var(--accent);
 }
 
 .minutes-content {
@@ -114,6 +120,59 @@
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.events-content {
+    display: flex;
+    align-items: center;
+}
+
+.events-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.event-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.event-goal {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.event-yellow_card {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.event-red_card {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.event-substitution {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+}
+
+.event-more {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.no-events {
+    color: var(--muted);
+    font-style: italic;
 }
 
 /* No matches message */
@@ -224,8 +283,8 @@
         content: "Date:";
     }
 
-    .match-teams:before {
-        content: "Match:";
+    .match-opponent:before {
+        content: "Opponent:";
     }
 
     .match-competition:before {
@@ -234,6 +293,10 @@
 
     .match-minutes:before {
         content: "Minutes:";
+    }
+
+    .match-events:before {
+        content: "Events:";
     }
 
     .no-matches-message {

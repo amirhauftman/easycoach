@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import MatchPlayer, { type MatchPlayerHandle } from '../components/video/MatchPlayer';
 import { easycoachAPI } from '../services/easycoach-api';
@@ -7,6 +7,7 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import Loading from '../components/common/Loading';
 import EventsTab from '../components/matches/EventsTab';
 import { useMatchDetail } from '../hooks/useQueries';
+import { useAppStore } from '../stores/useAppStore';
 import '../App.css';
 
 const TABS: { key: 'lineups' | 'events'; label: string }[] = [
@@ -27,8 +28,27 @@ export default function MatchDetail() {
     const navigate = useNavigate();
     const location = useLocation();
     const { data: matchData, isLoading: loading, error } = useMatchDetail(matchId!);
+    const { setBreadcrumbs, setSelectedMatchId, setSelectedMatchTitle } = useAppStore();
     const [tab, setTab] = useState<'lineups' | 'events'>('lineups');
     const playerRef = useRef<MatchPlayerHandle | null>(null);
+
+    // Set breadcrumbs when match data is available
+    useEffect(() => {
+        if (matchData && matchId) {
+            setSelectedMatchId(matchId);
+            const matchTitle = `${matchData.home_team} vs ${matchData.away_team}`;
+            setSelectedMatchTitle(matchTitle);
+            setBreadcrumbs([
+                { label: 'Matches', path: '/matches', icon: '⚽' },
+                { label: matchTitle, icon: '🏆', isActive: true }
+            ]);
+        }
+
+        return () => {
+            setBreadcrumbs([]);
+            // Don't clear selectedMatchId here - it's needed for nested pages like PlayerDetail
+        };
+    }, [matchData, matchId, setBreadcrumbs, setSelectedMatchTitle]);
 
     // Get pxlt_game_id from navigation state if available
     const pxltGameIdFromState = location.state?.pxlt_game_id;
@@ -37,7 +57,7 @@ export default function MatchDetail() {
         if (!matchData) return null;
 
         const match = {
-            vid: matchData.video?.normal_hls,
+            vid: matchData.video_url || matchData.video?.normal_hls,
             home_team: { name: matchData.home_team },
             away_team: { name: matchData.away_team },
             pxlt_game_id: matchData.pxlt_game_id,
@@ -76,17 +96,17 @@ export default function MatchDetail() {
                     timestamp: event.timestamp || (event.start_minute * 60 + (event.start_second || 0)),
                     player: {
                         id: event.player_id,
-                        name: matchData.home_team_players.find(p => p.player_id === event.player_id)
-                            ? easycoachAPI.formatPlayerName(matchData.home_team_players.find(p => p.player_id === event.player_id)!)
-                            : matchData.away_team_players.find(p => p.player_id === event.player_id)
-                                ? easycoachAPI.formatPlayerName(matchData.away_team_players.find(p => p.player_id === event.player_id)!)
-                                : 'Unknown Player'
+                        name: (() => {
+                            const allPlayers = [...matchData.home_team_players, ...matchData.away_team_players];
+                            const player = allPlayers.find(p => String(p.player_id) === String(event.player_id));
+                            return player ? easycoachAPI.formatPlayerName(player) : 'Unknown Player';
+                        })()
                     }
                 }))
         };
 
-        const hasVideo = !!pxltGameIdFromState || !!match.pxlt_game_id || !!matchData.video?.normal_hls;
-        const videoUrl = matchData.video?.normal_hls;
+        const hasVideo = !!pxltGameIdFromState || !!matchData.video_url || !!matchData.video?.normal_hls;
+        const videoUrl = matchData.video_url || matchData.video?.normal_hls;
         const homeLineup = normalizeLineup(match.home_lineup);
         const awayLineup = normalizeLineup(match.away_lineup);
         const events = Array.isArray(match.events) ? match.events : [];
@@ -103,7 +123,7 @@ export default function MatchDetail() {
     const { match, hasVideo, videoUrl, homeLineup, awayLineup, events } = computedData;
 
     function handleEventClick(event: Event) {
-        if (!hasVideo || match.pxlt_game_id) return; // Only seek for HLS, not Pixellot
+        if (!hasVideo) return;
         const ts = event.timestamp || event.minute * 60;
         if (playerRef.current) playerRef.current.seekTo(ts);
     }
@@ -123,16 +143,7 @@ export default function MatchDetail() {
                 {match.home_team?.name || 'Home'} vs {match.away_team?.name || 'Away'}
             </h2>
             <div className="video-section">
-                {match.pxlt_game_id ? (
-                    <iframe
-                        src={`https://pixellot.tv/watch/${match.pxlt_game_id}`}
-                        width="100%"
-                        height="400"
-                        frameBorder="0"
-                        allowFullScreen
-                        title="Pixellot Video"
-                    />
-                ) : hasVideo ? (
+                {hasVideo ? (
                     <MatchPlayer
                         ref={playerRef}
                         hlsUrl={videoUrl}
@@ -170,7 +181,9 @@ export default function MatchDetail() {
                                             <>
                                                 <span className="shirt-num">{homeLineup.starters[i].shirt_number || '-'}</span>
                                                 <span className="player-name">{homeLineup.starters[i].name}</span>
-                                                <span className="player-pos">{homeLineup.starters[i].position || ''}</span>
+                                                {homeLineup.starters[i].position && homeLineup.starters[i].position !== 'FW' && (
+                                                    <span className="player-pos">{homeLineup.starters[i].position}</span>
+                                                )}
                                             </>
                                         ) : (
                                             <span className="empty-player">-</span>
@@ -181,7 +194,9 @@ export default function MatchDetail() {
                                             <>
                                                 <span className="shirt-num">{awayLineup.starters[i].shirt_number || '-'}</span>
                                                 <span className="player-name">{awayLineup.starters[i].name}</span>
-                                                <span className="player-pos">{awayLineup.starters[i].position || ''}</span>
+                                                {awayLineup.starters[i].position && awayLineup.starters[i].position !== 'FW' && (
+                                                    <span className="player-pos">{awayLineup.starters[i].position}</span>
+                                                )}
                                             </>
                                         ) : (
                                             <span className="empty-player">-</span>
@@ -208,7 +223,9 @@ export default function MatchDetail() {
                                             <>
                                                 <span className="shirt-num">{homeLineup.subs[i].shirt_number || '-'}</span>
                                                 <span className="player-name">{homeLineup.subs[i].name}</span>
-                                                <span className="player-pos">{homeLineup.subs[i].position || ''}</span>
+                                                {homeLineup.subs[i].position && homeLineup.subs[i].position !== 'FW' && (
+                                                    <span className="player-pos">{homeLineup.subs[i].position}</span>
+                                                )}
                                             </>
                                         ) : (
                                             <span className="empty-player">-</span>
@@ -219,7 +236,9 @@ export default function MatchDetail() {
                                             <>
                                                 <span className="shirt-num">{awayLineup.subs[i].shirt_number || '-'}</span>
                                                 <span className="player-name">{awayLineup.subs[i].name}</span>
-                                                <span className="player-pos">{awayLineup.subs[i].position || ''}</span>
+                                                {awayLineup.subs[i].position && awayLineup.subs[i].position !== 'FW' && (
+                                                    <span className="player-pos">{awayLineup.subs[i].position}</span>
+                                                )}
                                             </>
                                         ) : (
                                             <span className="empty-player">-</span>
@@ -235,7 +254,6 @@ export default function MatchDetail() {
                 <EventsTab
                     events={events}
                     hasVideo={hasVideo}
-                    isPixellot={!!match.pxlt_game_id}
                     onEventClick={handleEventClick}
                     onPlayerClick={handlePlayerClick}
                 />

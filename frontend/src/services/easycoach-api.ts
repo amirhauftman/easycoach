@@ -2,8 +2,6 @@
 import type { ApiMatch, ApiMatchDetail, ApiPlayer, ApiEvent } from '../types';
 
 const API_BASE_URL = 'http://localhost:3000/api';
-const LEAGUE_ID = '726';
-const SEASON_ID = '26';
 
 // API service class
 class EasyCoachAPI {
@@ -24,42 +22,28 @@ class EasyCoachAPI {
     }
 
     async fetchMatches(): Promise<Record<string, ApiMatch[]>> {
-        const url = `${API_BASE_URL}/matches?leagueId=${LEAGUE_ID}&seasonId=${SEASON_ID}`;
+        const url = `${API_BASE_URL}/matches`;
 
         try {
-            const response = await this.fetchWithErrorHandling(url);            // Backend returns a flat array of matches, not grouped
+            const response = await this.fetchWithErrorHandling(url);
+            // Backend returns a flat array of matches from DB
             const matches = Array.isArray(response) ? response : [];
 
-            // Transform matches to our format
-            const transformedMatches: ApiMatch[] = matches.map(match => {
-                const result = match.result;
-                let home_score: number | undefined;
-                let away_score: number | undefined;
-
-                if (result && typeof result === 'string') {
-                    const scoreParts = result.split('-');
-                    if (scoreParts.length === 2) {
-                        home_score = parseInt(scoreParts[0], 10);
-                        away_score = parseInt(scoreParts[1], 10);
-                    }
-                }
-
-                // Map API fields to our interface
-                return {
-                    game_id: match.game_id,
-                    home_team: match.team_a_name_en || match.team_a_name,
-                    away_team: match.team_b_name_en || match.team_b_name,
-                    kickoff: match.date + ' ' + match.hour,
-                    competition: Array.isArray(match.fixture_name_en) ? match.fixture_name : match.fixture_name,
-                    match_date: match.date, // This field exists in the API response
-                    home_team_id: match.team_a_id,
-                    away_team_id: match.team_b_id,
-                    home_score,
-                    away_score,
-                    pxlt_game_id: match.pxlt_game_id,
-                    season_name: match.season_name,
-                };
-            });
+            // Transform DB matches to our ApiMatch format
+            const transformedMatches: ApiMatch[] = matches.map(match => ({
+                game_id: match.match_id,
+                home_team: match.home_team,
+                away_team: match.away_team,
+                kickoff: match.match_date ? new Date(match.match_date).toLocaleString() : 'TBD',
+                competition: match.competition || 'No competition name',
+                match_date: match.match_date ? new Date(match.match_date).toISOString().split('T')[0] : '1970-01-01',
+                home_team_id: match.home_team_id || '',
+                away_team_id: match.away_team_id || '',
+                home_score: match.home_score,
+                away_score: match.away_score,
+                pxlt_game_id: match.pxlt_game_id,
+                season_name: match.season_name,
+            }));
 
             // Group matches by date using the existing utility method
             const groupedMatches = this.groupMatchesByDate(transformedMatches);
@@ -261,7 +245,7 @@ class EasyCoachAPI {
 
     // Utility method to format player name
     formatPlayerName(player: ApiPlayer): string {
-        return `${player.fname} ${player.lname}`.trim();
+        return `${player.fname} ${player.lname}`.trim().toLowerCase();
     }
 
     // Utility method to extract events for match details
@@ -355,6 +339,100 @@ class EasyCoachAPI {
             }
             return a.start_second - b.start_second;
         });
+    }
+
+    async fetchPlayer(playerId: string): Promise<any> {
+        const url = `${API_BASE_URL}/players/${playerId}`;
+        return await this.fetchWithErrorHandling(url);
+    }
+
+    async fetchPlayerMatches(playerId: string): Promise<any[]> {
+        const url = `${API_BASE_URL}/matches/player/${playerId}`;
+        return await this.fetchWithErrorHandling(url);
+    }
+
+    // Skill-related API methods
+    async fetchPlayerSkills(playerId: string): Promise<Record<string, number>> {
+        const url = `${API_BASE_URL}/players/${playerId}/skills`;
+        try {
+            const result = await this.fetchWithErrorHandling(url);
+            console.log('Skills loaded from backend:', result);
+            return result;
+        } catch (error) {
+            console.warn('Backend skills not available, checking localStorage...');
+
+            // Check localStorage for previously saved skills
+            try {
+                const storageKey = `player-skills-${playerId}`;
+                const savedSkills = localStorage.getItem(storageKey);
+
+                if (savedSkills) {
+                    const parsedSkills = JSON.parse(savedSkills);
+                    console.log('Skills loaded from localStorage:', parsedSkills);
+                    return parsedSkills;
+                }
+            } catch (localError) {
+                console.warn('Failed to load from localStorage:', localError);
+            }
+
+            // Final fallback: use default mock skills
+            console.warn('Using default mock skills');
+            const defaultSkills = {
+                Passing: 6,
+                Dribbling: 5,
+                Speed: 7,
+                Strength: 6,
+                Vision: 6,
+                Defending: 5,
+            };
+
+            return defaultSkills;
+        }
+    }
+
+    async savePlayerSkills(playerId: string, skills: Record<string, number>): Promise<any> {
+        console.log('savePlayerSkills called with playerId:', playerId, 'skills:', skills);
+        const url = `${API_BASE_URL}/players/${playerId}/skills`;
+        try {
+            console.log('Attempting to save to backend at:', url);
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ skills }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Skills saved successfully to backend:', result);
+            return { success: true, message: 'Skills saved successfully', skills, source: 'backend' };
+        } catch (error) {
+            console.error('Backend save failed:', error);
+
+            // Fallback: Save to localStorage when backend is not available
+            try {
+                const storageKey = `player-skills-${playerId}`;
+                localStorage.setItem(storageKey, JSON.stringify(skills));
+                console.log('Skills saved to localStorage as fallback with key:', storageKey);
+
+                // Simulate network delay for realistic UX
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                return {
+                    success: true,
+                    message: 'Skills saved locally (backend unavailable)',
+                    skills,
+                    source: 'localStorage'
+                };
+            } catch (localError) {
+                console.error('localStorage save also failed:', localError);
+                throw new Error('Unable to save skills - both backend and localStorage failed');
+            }
+        }
     }
 }
 

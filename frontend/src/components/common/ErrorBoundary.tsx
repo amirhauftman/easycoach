@@ -12,7 +12,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<{}>, 
         return { hasError: true };
     }
 
-    componentDidCatch(error: unknown, info: unknown) {
+    componentDidCatch(_error: unknown, _info: unknown) {
         // TODO: send to telemetry
         // console.error(error, info);
     }

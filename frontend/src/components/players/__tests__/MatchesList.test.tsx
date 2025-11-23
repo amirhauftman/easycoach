@@ -1,4 +1,4 @@
-import React from 'react';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import MatchesList from '../MatchesList';
 
@@ -9,7 +9,7 @@ describe('MatchesList', () => {
     });
 
     it('renders a match row', () => {
-        const matches = [{ match_id: 1, match_date: '2025-10-25T10:00:00', home_team: 'Home', away_team: 'Away', competition: 'League', minutes_played: 90 }];
+        const matches = [{ match_id: '123', match_date: '2023-06-15', home_team: 'Home', away_team: 'Away', competition: 'League', minutes_played: 90 }];
         render(<MatchesList matches={matches} />);
         expect(screen.getByText(/Home/)).toBeInTheDocument();
         expect(screen.getByText(/League/)).toBeInTheDocument();

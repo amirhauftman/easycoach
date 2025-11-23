@@ -3,9 +3,22 @@ import MatchList from '../components/matches/MatchList';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 import { useMatches } from '../hooks/useQueries';
+import { useAppStore } from '../stores/useAppStore';
 import type { ApiMatch } from '../types';
 
 const MatchesPage: React.FC = () => {
+    const { setBreadcrumbs } = useAppStore();
+
+    // Set breadcrumbs for matches page
+    useEffect(() => {
+        setBreadcrumbs([
+            { label: 'Home', path: '/', icon: '🏠' },
+            { label: 'Matches', icon: '⚽', isActive: true }
+        ]);
+
+        return () => setBreadcrumbs([]);
+    }, [setBreadcrumbs]);
+
     // Clean up old localStorage cache entries on mount
     useEffect(() => {
         // Remove old cache entries that are no longer needed

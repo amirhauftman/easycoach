@@ -164,7 +164,7 @@ export const MatchList: React.FC<Props> = ({ matchesByDate, total }) => {
                                 const homeScore = m.home_score ?? m.homeScore ?? m.score_home ?? '-';
                                 const awayScore = m.away_score ?? m.awayScore ?? m.score_away ?? '-';
                                 const kickoff = m.kickoff ?? m.kickoff_time ?? m.date ?? m.match_date ?? null;
-                                const comp = m.season_name ?? 'no competition name';
+                                const comp = m.competition ?? m.season_name ?? 'no competition name';
                                 let kickoffLabel = '-';
                                 if (kickoff) {
                                     try {
