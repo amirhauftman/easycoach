@@ -3,8 +3,6 @@ import { devtools } from 'zustand/middleware';
 import type { BreadcrumbItem } from '../components/common/Breadcrumb';
 
 interface AppState {
-    // User preferences
-    preferredVideoQuality: 'auto' | 'high' | 'medium' | 'low';
 
     // Current selections/context
     selectedMatchId: string | null;
@@ -15,7 +13,6 @@ interface AppState {
     breadcrumbs: BreadcrumbItem[];
 
     // Actions
-    setPreferredVideoQuality: (quality: 'auto' | 'high' | 'medium' | 'low') => void;
     setSelectedMatchId: (id: string | null) => void;
     setSelectedMatchTitle: (title: string | null) => void;
     setSelectedPlayerId: (id: string | null) => void;
@@ -28,7 +25,6 @@ interface AppState {
 }
 
 const initialState = {
-    preferredVideoQuality: 'auto' as const,
     selectedMatchId: null,
     selectedMatchTitle: null,
     selectedPlayerId: null,
@@ -40,7 +36,6 @@ export const useAppStore = create<AppState>()(
         (set) => ({
             ...initialState,
 
-            setPreferredVideoQuality: (quality) => set({ preferredVideoQuality: quality }),
             setSelectedMatchId: (id) => set({ selectedMatchId: id }),
             setSelectedMatchTitle: (title) => set({ selectedMatchTitle: title }),
             setSelectedPlayerId: (id) => set({ selectedPlayerId: id }),

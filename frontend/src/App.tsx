@@ -10,7 +10,6 @@ import './components/common/Breadcrumb.css';
 // Lazy load page components for code splitting
 const MatchesPage = lazy(() => import('./pages/MatchesPage'));
 const MatchDetail = lazy(() => import('./pages/MatchDetail'));
-const VideoPage = lazy(() => import('./pages/VideoPage'));
 const PlayerDetail = lazy(() => import('./pages/PlayerDetail'));
 
 const App: React.FC = () => {
@@ -26,7 +25,6 @@ const App: React.FC = () => {
               <Route path="/" element={<MatchesPage />} />
               <Route path="/matches" element={<MatchesPage />} />
               <Route path="/matches/:matchId" element={<MatchDetail />} />
-              <Route path="/matches/:matchId/video" element={<VideoPage />} />
               <Route path="/players/:playerId" element={<PlayerDetail />} />
             </Routes>
           </Suspense>
