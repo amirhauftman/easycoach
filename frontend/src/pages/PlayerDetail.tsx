@@ -115,17 +115,23 @@ const PlayerDetail: FC<PlayerDetailProps> = ({ playerId: propPlayerId, playerNam
 
     // Handle saving skills
     const handleSaveSkills = async (skillsToSave: Record<string, number>) => {
-        console.log('handleSaveSkills called with:', skillsToSave);
-        console.log('saveSkillsMutation status:', {
-            isPending: saveSkillsMutation.isPending,
-            isError: saveSkillsMutation.isError,
-            isSuccess: saveSkillsMutation.isSuccess
-        });
+        if (import.meta.env.DEV) {
+            console.log('handleSaveSkills called with:', skillsToSave);
+            console.log('saveSkillsMutation status:', {
+                isPending: saveSkillsMutation.isPending,
+                isError: saveSkillsMutation.isError,
+                isSuccess: saveSkillsMutation.isSuccess,
+            });
+        }
 
         try {
-            console.log('Calling saveSkillsMutation.mutateAsync');
+            if (import.meta.env.DEV) {
+                console.log('Calling saveSkillsMutation.mutateAsync');
+            }
             const result = await saveSkillsMutation.mutateAsync(skillsToSave);
-            console.log('Save result:', result);
+            if (import.meta.env.DEV) {
+                console.log('Save result:', result);
+            }
 
             setToastConfig({
                 show: true,

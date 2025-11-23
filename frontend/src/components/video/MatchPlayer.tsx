@@ -50,7 +50,9 @@ const MatchPlayer = forwardRef<MatchPlayerHandle, Props>(({ videoUrl, iframeUrl,
             // Check if HLS is supported natively
             if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 // Native HLS support (Safari)
-                console.log('Using native HLS support')
+                if (import.meta.env.DEV) {
+                    console.log('Using native HLS support')
+                }
                 video.src = proxiedHlsUrl
             } else if (Hls.isSupported()) {
                 // Use hls.js for other browsers
@@ -125,7 +127,9 @@ const MatchPlayer = forwardRef<MatchPlayerHandle, Props>(({ videoUrl, iframeUrl,
     }
 
     if (iframeUrl && !iframeError) {
-        console.log('Loading iframe with URL:', iframeUrl)
+        if (import.meta.env.DEV) {
+            console.log('Loading iframe with URL:', iframeUrl)
+        }
         return (
             <div style={{ marginBottom: 12 }}>
                 <iframe
@@ -135,7 +139,11 @@ const MatchPlayer = forwardRef<MatchPlayerHandle, Props>(({ videoUrl, iframeUrl,
                     height={420}
                     style={{ borderRadius: 8, border: 'none' }}
                     onError={handleIframeError}
-                    onLoad={() => console.log('Iframe loaded successfully')}
+                    onLoad={() => {
+                        if (import.meta.env.DEV) {
+                            console.log('Iframe loaded successfully')
+                        }
+                    }}
                     allow="autoplay; fullscreen"
                     sandbox="allow-scripts allow-same-origin allow-presentation"
                 />

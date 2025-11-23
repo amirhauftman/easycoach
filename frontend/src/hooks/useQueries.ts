@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { easycoachAPI } from '../services/easycoach-api';
+import { useToast } from './useToast';
 
 /**
  * Query keys for consistent cache management
@@ -81,6 +82,7 @@ export function usePlayerSkills(playerId: string) {
  */
 export function useSavePlayerSkills(playerId: string) {
     const queryClient = useQueryClient();
+    const toast = useToast();
 
     return useMutation({
         mutationFn: (skills: Record<string, number>) =>
@@ -92,9 +94,13 @@ export function useSavePlayerSkills(playerId: string) {
             queryClient.invalidateQueries({ queryKey: queryKeys.playerSkills(playerId) });
             // Invalidate player data in case it includes skills
             queryClient.invalidateQueries({ queryKey: queryKeys.player(playerId) });
+
+            // Show success toast
+            toast.success(data.message || 'Skills saved successfully!');
         },
-        onError: (error) => {
+        onError: (error: Error) => {
             console.error('Failed to save player skills:', error);
+            toast.error(error.message || 'Failed to save skills. Please try again.');
         },
     });
 }

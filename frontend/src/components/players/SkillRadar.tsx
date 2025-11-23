@@ -52,29 +52,43 @@ const SkillRadar: React.FC<SkillRadarProps> = ({
     }, [skills, hasUnsavedChanges]);
 
     const handleSkillChange = (skill: string, value: number) => {
-        console.log(`Skill changed: ${skill} = ${value}`);
+        if (import.meta.env.DEV) {
+            console.log(`Skill changed: ${skill} = ${value}`);
+        }
         const next = { ...editableSkills, [skill]: value };
         setEditableSkills(next);
         setHasUnsavedChanges(true);
-        console.log('Has unsaved changes set to true');
+        if (import.meta.env.DEV) {
+            console.log('Has unsaved changes set to true');
+        }
         // Don't call onChange during editing - only call it on reset to sync with parent
     };
 
     const handleSave = async () => {
-        console.log('Save button clicked. Has unsaved changes:', hasUnsavedChanges);
+        if (import.meta.env.DEV) {
+            console.log('Save button clicked. Has unsaved changes:', hasUnsavedChanges);
+        }
         if (onSave && hasUnsavedChanges) {
             try {
-                console.log('Attempting to save skills:', editableSkills);
+                if (import.meta.env.DEV) {
+                    console.log('Attempting to save skills:', editableSkills);
+                }
                 await onSave(editableSkills);
                 setHasUnsavedChanges(false);
-                console.log('Skills saved successfully');
+                if (import.meta.env.DEV) {
+                    console.log('Skills saved successfully');
+                }
             } catch (error) {
                 console.error('Failed to save skills:', error);
             }
         } else if (!hasUnsavedChanges) {
-            console.log('No changes to save');
+            if (import.meta.env.DEV) {
+                console.log('No changes to save');
+            }
         } else if (!onSave) {
-            console.log('No onSave function provided');
+            if (import.meta.env.DEV) {
+                console.log('No onSave function provided');
+            }
         }
     };
 
@@ -230,12 +244,14 @@ const SkillRadar: React.FC<SkillRadarProps> = ({
                         <div className="skill-actions">
                             <button
                                 onClick={() => {
-                                    console.log('Save button clicked. State:', {
-                                        hasUnsavedChanges,
-                                        isSaving,
-                                        onSave: !!onSave,
-                                        buttonDisabled: !hasUnsavedChanges || isSaving
-                                    });
+                                    if (import.meta.env.DEV) {
+                                        console.log('Save button clicked. State:', {
+                                            hasUnsavedChanges,
+                                            isSaving,
+                                            onSave: !!onSave,
+                                            buttonDisabled: !hasUnsavedChanges || isSaving
+                                        });
+                                    }
                                     handleSave();
                                 }}
                                 disabled={!hasUnsavedChanges || isSaving}

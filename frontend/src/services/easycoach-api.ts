@@ -1,7 +1,7 @@
 // EasyCoach API service functions
 import type { ApiMatch, ApiMatchDetail, ApiPlayer, ApiEvent } from '../types';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:3000/api';
 
 // API service class
 class EasyCoachAPI {
@@ -63,10 +63,12 @@ class EasyCoachAPI {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                console.log('Loaded local match data:', data);
-                console.log('Events from local data:', data.events);
-                console.log('Home team players events:', data.home_team_players.map((p: any) => ({ name: `${p.fname} ${p.lname}`, events: p.events })));
-                console.log('Away team players events:', data.away_team_players.map((p: any) => ({ name: `${p.fname} ${p.lname}`, events: p.events })));
+                if (import.meta.env.DEV) {
+                    console.log('Loaded local match data:', data);
+                    console.log('Events from local data:', data.events);
+                    console.log('Home team players events:', data.home_team_players.map((p: any) => ({ name: `${p.fname} ${p.lname}`, events: p.events })));
+                    console.log('Away team players events:', data.away_team_players.map((p: any) => ({ name: `${p.fname} ${p.lname}`, events: p.events })));
+                }
 
                 // Transform local JSON to ApiMatchDetail format
                 return {
@@ -116,13 +118,17 @@ class EasyCoachAPI {
 
         try {
             const data = await this.fetchWithErrorHandling(url);
-            console.log('Full match detail API response:', data);
+            if (import.meta.env.DEV) {
+                console.log('Full match detail API response:', data);
+            }
 
             // The API returns {status: 'ok', match_id: '...', match_details: {..., video: {...}}, teams: [...]}
             // We need to extract the actual match data
             if (data.match_details) {
                 const matchDetails = data.match_details;
-                console.log('match_details:', matchDetails);
+                if (import.meta.env.DEV) {
+                    console.log('match_details:', matchDetails);
+                }
                 const teams = data.teams || [];
 
                 // Assume first team is home, second is away (no clear home/away indicator in API)
@@ -356,7 +362,9 @@ class EasyCoachAPI {
         const url = `${API_BASE_URL}/players/${playerId}/skills`;
         try {
             const result = await this.fetchWithErrorHandling(url);
-            console.log('Skills loaded from backend:', result);
+            if (import.meta.env.DEV) {
+                console.log('Skills loaded from backend:', result);
+            }
             return result;
         } catch (error) {
             console.warn('Backend skills not available, checking localStorage...');
@@ -368,7 +376,9 @@ class EasyCoachAPI {
 
                 if (savedSkills) {
                     const parsedSkills = JSON.parse(savedSkills);
-                    console.log('Skills loaded from localStorage:', parsedSkills);
+                    if (import.meta.env.DEV) {
+                        console.log('Skills loaded from localStorage:', parsedSkills);
+                    }
                     return parsedSkills;
                 }
             } catch (localError) {
@@ -376,7 +386,9 @@ class EasyCoachAPI {
             }
 
             // Final fallback: use default mock skills
-            console.warn('Using default mock skills');
+            if (import.meta.env.DEV) {
+                console.warn('Using default mock skills');
+            }
             const defaultSkills = {
                 Passing: 6,
                 Dribbling: 5,
@@ -391,10 +403,14 @@ class EasyCoachAPI {
     }
 
     async savePlayerSkills(playerId: string, skills: Record<string, number>): Promise<any> {
-        console.log('savePlayerSkills called with playerId:', playerId, 'skills:', skills);
+        if (import.meta.env.DEV) {
+            console.log('savePlayerSkills called with playerId:', playerId, 'skills:', skills);
+        }
         const url = `${API_BASE_URL}/players/${playerId}/skills`;
         try {
-            console.log('Attempting to save to backend at:', url);
+            if (import.meta.env.DEV) {
+                console.log('Attempting to save to backend at:', url);
+            }
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -408,7 +424,9 @@ class EasyCoachAPI {
             }
 
             const result = await response.json();
-            console.log('Skills saved successfully to backend:', result);
+            if (import.meta.env.DEV) {
+                console.log('Skills saved successfully to backend:', result);
+            }
             return { success: true, message: 'Skills saved successfully', skills, source: 'backend' };
         } catch (error) {
             console.error('Backend save failed:', error);
@@ -417,7 +435,9 @@ class EasyCoachAPI {
             try {
                 const storageKey = `player-skills-${playerId}`;
                 localStorage.setItem(storageKey, JSON.stringify(skills));
-                console.log('Skills saved to localStorage as fallback with key:', storageKey);
+                if (import.meta.env.DEV) {
+                    console.log('Skills saved to localStorage as fallback with key:', storageKey);
+                }
 
                 // Simulate network delay for realistic UX
                 await new Promise(resolve => setTimeout(resolve, 500));

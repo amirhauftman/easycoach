@@ -31,7 +31,9 @@ const MatchesPage: React.FC = () => {
         keysToRemove.forEach(key => {
             if (localStorage.getItem(key)) {
                 localStorage.removeItem(key);
-                console.log(`Removed old cache entry: ${key}`);
+                if (import.meta.env.DEV) {
+                    console.log(`Removed old cache entry: ${key}`);
+                }
             }
         });
     }, []);

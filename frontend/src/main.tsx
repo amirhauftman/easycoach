@@ -5,6 +5,7 @@ import './index.css';
 import './styles/theme.css';
 import App from './App.tsx';
 import { BrowserRouter } from 'react-router-dom';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 // Configure QueryClient with sensible defaults
 const queryClient = new QueryClient({
@@ -29,10 +30,12 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

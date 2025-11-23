@@ -1,31 +1,53 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { ApiMatch } from '../../types';
 
 interface Props {
-    match: any;
+    match: ApiMatch;
 }
 
-export const MatchCard: React.FC<Props> = ({ match }) => {
+const MatchCard: React.FC<Props> = ({ match }) => {
     const navigate = useNavigate();
-    const id = match.game_id ?? match.id ?? match.match_id ?? match.matchId
+    const id = match.game_id || match.match_id || match.id?.toString();
+
     const onOpen = () => {
-        console.log('MatchCard onClick, match:', match, 'id:', id);
+        if (import.meta.env.DEV) {
+            console.log('MatchCard onClick, match:', match, 'id:', id);
+        }
         if (id) {
             navigate(`/matches/${id}`);
         }
     }
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onOpen();
+        }
+    };
+
     return (
-        <div className="match-card" onClick={onOpen}>
+        <div
+            className="match-card"
+            onClick={onOpen}
+            onKeyDown={handleKeyDown}
+            role="button"
+            tabIndex={0}
+            aria-label={`Match: ${match.home_team} vs ${match.away_team}, Score: ${match.home_score ?? 0} - ${match.away_score ?? 0}`}
+        >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>{match.home_team ?? match.homeTeam ?? 'Home'}</div>
-                <div style={{ fontWeight: 700 }}>{(match.home_score ?? match.homeScore) ?? '-'} - {(match.away_score ?? match.awayScore) ?? '-'}</div>
-                <div>{match.away_team ?? match.awayTeam ?? 'Away'}</div>
+                <div>{match.home_team}</div>
+                <div style={{ fontWeight: 700 }}>
+                    {match.home_score ?? '-'} - {match.away_score ?? '-'}
+                </div>
+                <div>{match.away_team}</div>
             </div>
-            <div className="match-meta">{new Date(match.match_date ?? match.kickoff ?? Date.now()).toLocaleString()}</div>
+            <div className="match-meta">
+                {new Date(match.match_date || match.kickoff).toLocaleString()}
+            </div>
             {match.competition && <div className="match-competition">{match.competition}</div>}
         </div>
     );
 };
 
-export default MatchCard;
+export default React.memo(MatchCard);
