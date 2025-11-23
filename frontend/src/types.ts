@@ -28,6 +28,7 @@ export interface ApiMatchDetail {
     away_score: number;
     match_date: string;
     pxlt_game_id?: string;
+    video_url?: string; // Direct access to video URL from database
     home_team_players: ApiPlayer[];
     away_team_players: ApiPlayer[];
     events?: ApiEvent[];
