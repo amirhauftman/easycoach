@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EasyCoachPlayersApiService } from './easycoach-players-api.service';
 import { Player } from './entities/player.entity';
 import { PlayerStat } from './entities/player-stat.entity';
 import { UpdatePlayerStatsDto } from './dto/update-player-stats.dto';
@@ -13,59 +12,23 @@ export class PlayersService {
     private readonly playerRepository: Repository<Player>,
     @InjectRepository(PlayerStat)
     private readonly playerStatRepository: Repository<PlayerStat>,
-    private readonly api: EasyCoachPlayersApiService,
   ) { }
 
   async getPlayers(teamId?: string) {
-    // Try to get from database first
-    let players = await this.playerRepository.find({
+    // Get players from database only
+    const players = await this.playerRepository.find({
       where: teamId ? { team_id: teamId } : {},
       relations: ['stats'],
     });
-
-    // If no players in DB, fetch from API and save
-    if (players.length === 0) {
-      const data = await this.api.fetchPlayers(teamId);
-      const list: any[] = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.data)
-          ? data.data
-          : [];
-
-      // Save players to database
-      for (const playerData of list) {
-        await this.savePlayerFromApi(playerData);
-      }
-
-      // Fetch again from DB
-      players = await this.playerRepository.find({
-        where: teamId ? { team_id: teamId } : {},
-        relations: ['stats'],
-      });
-    }
 
     return { data: players, meta: { count: players.length } };
   }
 
   async getPlayerById(id: string) {
-    // Try to get from database first
     let player = await this.playerRepository.findOne({
       where: { player_id: id },
       relations: ['stats', 'matches', 'events'],
     });
-
-    // If not in DB, fetch from API and save
-    if (!player) {
-      const apiData = await this.api.fetchPlayerDetails(id);
-      if (apiData) {
-        player = await this.savePlayerFromApi(apiData);
-        // Fetch again with relations
-        player = await this.playerRepository.findOne({
-          where: { player_id: id },
-          relations: ['stats', 'matches', 'events'],
-        });
-      }
-    }
 
     // Add team name from matches if available
     if (player && player.matches && player.matches.length > 0) {
@@ -100,56 +63,25 @@ export class PlayersService {
     }));
   }
 
-  private async savePlayerFromApi(apiPlayer: any): Promise<Player | null> {
-    const playerId =
-      apiPlayer.player_id || apiPlayer.id || String(apiPlayer.id);
-
-    if (!playerId) return null;
-
-    // Check if player already exists
-    const existing = await this.playerRepository.findOne({
+  async updatePlayerStats(playerId: string, statsData: Partial<UpdatePlayerStatsDto>) {
+    // Find player by external player_id
+    const player = await this.playerRepository.findOne({
       where: { player_id: playerId },
+      relations: ['stats'],
     });
 
-    const playerData = {
-      player_id: playerId,
-      team_id: apiPlayer.team_id || apiPlayer.team?.id || '',
-      fname:
-        apiPlayer.fname ||
-        apiPlayer.first_name ||
-        apiPlayer.name?.split(' ')[0] ||
-        '',
-      lname:
-        apiPlayer.lname ||
-        apiPlayer.last_name ||
-        apiPlayer.name?.split(' ').slice(1).join(' ') ||
-        '',
-      shirt_number: apiPlayer.shirt_number || apiPlayer.number,
-      position: apiPlayer.position || apiPlayer.team_position,
-      is_starter:
-        apiPlayer.is_starter !== undefined ? apiPlayer.is_starter : true,
-    };
-
-    let player: Player;
-    if (existing) {
-      await this.playerRepository.update(existing.id, playerData);
-      const updatedPlayer = await this.playerRepository.findOne({
-        where: { id: existing.id },
-      });
-      if (!updatedPlayer) throw new Error('Failed to update player');
-      player = updatedPlayer;
-    } else {
-      player = this.playerRepository.create(playerData);
-      player = await this.playerRepository.save(player);
+    if (!player) {
+      return null;
     }
 
-    // Save/update player stats if available
-    if (apiPlayer.stats || apiPlayer.passing || apiPlayer.dribbling) {
-      const statsDto = new UpdatePlayerStatsDto(apiPlayer);
-      await this.savePlayerStats(player.id, statsDto);
-    }
+    // Update or create stats
+    await this.savePlayerStats(player.id, statsData as UpdatePlayerStatsDto);
 
-    return player;
+    // Return updated player with stats
+    return this.playerRepository.findOne({
+      where: { player_id: playerId },
+      relations: ['stats'],
+    });
   }
 
   private async savePlayerStats(playerId: number, statsData: UpdatePlayerStatsDto) {

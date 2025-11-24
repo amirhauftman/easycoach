@@ -20,7 +20,7 @@ import { CreateMatchDto } from './dto/create-match.dto';
 export class MatchesController {
   private readonly logger = new Logger(MatchesController.name);
 
-  constructor(private readonly matchesService: MatchesService) {}
+  constructor(private readonly matchesService: MatchesService) { }
 
   @Get()
   @ApiOperation({ summary: 'Get all matches' })
@@ -29,7 +29,6 @@ export class MatchesController {
     description: 'Returns all matches from database',
   })
   async getMatches() {
-    this.logger.log('GET /matches - Fetching all matches from database');
     return this.matchesService.getAllMatches();
   }
 
@@ -39,55 +38,6 @@ export class MatchesController {
     return {
       count: await this.matchesService.getMatchesCount(),
     };
-  }
-
-  @Post('sync')
-  async syncMatches(
-    @Query('leagueId') leagueId = '726',
-    @Query('seasonId') seasonId = '25',
-  ) {
-    this.logger.log(
-      `POST /matches/sync - Syncing matches for league ${leagueId}, season ${seasonId}`,
-    );
-    try {
-      const result = await this.matchesService.syncMatchesFromApi(
-        leagueId,
-        seasonId,
-      );
-      return {
-        success: true,
-        message: `Successfully synced ${result.synced} out of ${result.total} matches`,
-        ...result,
-      };
-    } catch (error) {
-      this.logger.error('Error syncing matches:', error.message);
-      throw new HttpException(
-        `Failed to sync matches: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  @Post('update-competition')
-  async updateCompetitionData() {
-    this.logger.log(
-      'POST /matches/update-competition - Updating existing matches with competition data',
-    );
-    try {
-      const result =
-        await this.matchesService.updateExistingMatchesWithCompetition();
-      return {
-        success: true,
-        message: `Updated ${result.updated} out of ${result.total} matches with competition data`,
-        ...result,
-      };
-    } catch (error) {
-      this.logger.error('Error updating competition data:', error.message);
-      throw new HttpException(
-        `Failed to update competition data: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
   }
 
   @Get(':id')

@@ -359,15 +359,24 @@ class EasyCoachAPI {
 
     // Skill-related API methods
     async fetchPlayerSkills(playerId: string): Promise<Record<string, number>> {
-        const url = `${API_BASE_URL}/players/${playerId}/skills`;
+        const url = `${API_BASE_URL}/players/${playerId}`;
         try {
             const result = await this.fetchWithErrorHandling(url);
             if (import.meta.env.DEV) {
-                console.log('Skills loaded from backend:', result);
+                console.log('Player data loaded from backend:', result);
             }
-            return result;
+            // Extract skills from player.stats if available
+            const skills = result?.stats || {};
+            return {
+                Passing: skills.passing || 5,
+                Dribbling: skills.dribbling || 5,
+                Speed: skills.speed || 5,
+                Strength: skills.strength || 5,
+                Vision: skills.vision || 5,
+                Defending: skills.defending || 5,
+            };
         } catch (error) {
-            console.warn('Backend skills not available, checking localStorage...');
+            console.warn('Backend player data not available, checking localStorage...');
 
             // Check localStorage for previously saved skills
             try {
@@ -406,17 +415,28 @@ class EasyCoachAPI {
         if (import.meta.env.DEV) {
             console.log('savePlayerSkills called with playerId:', playerId, 'skills:', skills);
         }
-        const url = `${API_BASE_URL}/players/${playerId}/skills`;
+        const url = `${API_BASE_URL}/players/${playerId}/stats`;
+
+        // Transform skills object to match backend DTO format (lowercase keys)
+        const statsPayload = {
+            passing: skills.Passing,
+            dribbling: skills.Dribbling,
+            speed: skills.Speed,
+            strength: skills.Strength,
+            vision: skills.Vision,
+            defending: skills.Defending,
+        };
+
         try {
             if (import.meta.env.DEV) {
-                console.log('Attempting to save to backend at:', url);
+                console.log('Attempting to save to backend at:', url, 'with payload:', statsPayload);
             }
             const response = await fetch(url, {
-                method: 'PUT',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ skills }),
+                body: JSON.stringify(statsPayload),
             });
 
             if (!response.ok) {
@@ -427,7 +447,7 @@ class EasyCoachAPI {
             if (import.meta.env.DEV) {
                 console.log('Skills saved successfully to backend:', result);
             }
-            return { success: true, message: 'Skills saved successfully', skills, source: 'backend' };
+            return { success: true, message: result.message || 'Skills saved successfully', skills, source: 'backend' };
         } catch (error) {
             console.error('Backend save failed:', error);
 
