@@ -721,6 +721,93 @@ main {
   }
 }
 
+/* Match card components */
+.match-teams-container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 12px;
+}
+
+.match-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.team-label {
+  font-size: 0.85em;
+  color: var(--muted);
+}
+
+.team-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.team-name {
+  font-weight: 700;
+}
+
+.match-score {
+  margin: 0 8px;
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+.match-meta {
+  margin-bottom: 12px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.video-indicator {
+  display: inline-block;
+  margin-left: 8px;
+  color: var(--accent);
+  font-size: 0.8em;
+}
+
+.match-actions {
+  margin-top: 8px;
+}
+
+.match-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  gap: 16px;
+}
+
+.page-size-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pagination-wrapper {
+  flex: 1;
+}
+
+/* Match list container */
+.match-list-container {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .match-pagination-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .match-teams-container {
+    gap: 16px;
+  }
+}
+
 /* Content container for breadcrumb layout */
 .content-container {
   max-width: 1200px;

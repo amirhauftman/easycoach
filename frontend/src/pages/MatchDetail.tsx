@@ -25,43 +25,15 @@ export default function MatchDetail() {
     const [viewMode, setViewMode] = useState<'lineups' | 'events-sidebar'>('lineups');
     const playerRef = useRef<MatchPlayerHandle | null>(null);
 
-    // Set breadcrumbs when match data is available
-    useEffect(() => {
-        if (matchData && matchId) {
-            setSelectedMatchId(matchId);
-            const matchTitle = `${matchData.home_team} vs ${matchData.away_team}`;
-            setSelectedMatchTitle(matchTitle);
-            setBreadcrumbs([
-                { label: 'Matches', path: '/matches', icon: '⚽' },
-                { label: matchTitle, icon: '🏆', isActive: true }
-            ]);
-        }
-
-        return () => {
-            setBreadcrumbs([]);
-        };
-    }, [matchData, matchId, setBreadcrumbs, setSelectedMatchTitle]);
-
     const pxltGameIdFromState = location.state?.pxlt_game_id;
 
-    // Use custom hooks for data processing
+    // IMPORTANT: All hooks must be called before any conditional returns
+    // Use custom hooks for data processing (they handle undefined matchData gracefully)
     const { homeLineup, awayLineup } = useMatchLineups(matchData);
     const events = useMatchEvents(matchData);
     const { hasVideo, videoUrl } = useVideoData(matchData, pxltGameIdFromState);
 
-    // Derived state
-    const showEventsSidebar = viewMode === 'events-sidebar';
-    const match = matchData ? {
-        home_team: { name: matchData.home_team },
-        away_team: { name: matchData.away_team }
-    } : null;
-
-    if (loading) return <Loading />;
-    if (error) return <ErrorMessage error={error.message} />;
-    if (!matchData || !match || !homeLineup || !awayLineup) {
-        return <div className="panel">No details available for this match.</div>;
-    }
-
+    // All useCallback hooks must also be before conditional returns
     const handleEventClick = useCallback((event: Event) => {
         if (!hasVideo) return;
         const ts = event.timestamp || event.minute * 60;
@@ -79,6 +51,37 @@ export default function MatchDetail() {
     const handleCloseSidebar = useCallback(() => {
         setViewMode('lineups');
     }, []);
+
+    // Set breadcrumbs when match data is available
+    useEffect(() => {
+        if (matchData && matchId) {
+            setSelectedMatchId(matchId);
+            const matchTitle = `${matchData.home_team} vs ${matchData.away_team}`;
+            setSelectedMatchTitle(matchTitle);
+            setBreadcrumbs([
+                { label: 'Matches', path: '/matches', icon: '⚽' },
+                { label: matchTitle, icon: '🏆', isActive: true }
+            ]);
+        }
+
+        return () => {
+            setBreadcrumbs([]);
+        };
+    }, [matchData, matchId, setBreadcrumbs, setSelectedMatchTitle]);
+
+    // Derived state
+    const showEventsSidebar = viewMode === 'events-sidebar';
+    const match = matchData ? {
+        home_team: { name: matchData.home_team },
+        away_team: { name: matchData.away_team }
+    } : null;
+
+    // Now safe to do conditional returns after all hooks have been called
+    if (loading) return <Loading />;
+    if (error) return <ErrorMessage error={error.message} />;
+    if (!matchData || !match || !homeLineup || !awayLineup) {
+        return <div className="panel">No details available for this match.</div>;
+    }
 
     return (
         <div className="panel match-detail">
