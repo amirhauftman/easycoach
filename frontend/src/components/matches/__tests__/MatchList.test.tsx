@@ -106,7 +106,7 @@ describe('MatchList', () => {
         renderWithRouter(<MatchList matchesByDate={mockMatchesWithVideo} total={3} />);
 
         const videoIndicators = screen.getAllByText('📹 Video available');
-        expect(videoIndicators).toHaveLength(2); // Only matches with pxlt_game_id show video indicator
+        expect(videoIndicators).toHaveLength(3); // All 3 matches have video (pxlt_game_id or video_url)
     });
 
     it('navigates to match details on button click', async () => {
@@ -289,6 +289,6 @@ describe('MatchList', () => {
         expect(screen.getByText('Team E')).toBeInTheDocument();
 
         const videoIndicators = screen.getAllByText('📹 Video available');
-        expect(videoIndicators).toHaveLength(1); // Only matches with pxlt_game_id show video
+        expect(videoIndicators).toHaveLength(3); // All matches show video indicator when they have video sources
     });
 });

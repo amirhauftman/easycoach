@@ -1,5 +1,5 @@
 import React from 'react';
-import { PAGE_SIZE_OPTIONS, type NormalizedMatch } from '../../utils/matchUtils';
+import { PAGE_SIZE_OPTIONS } from '../../utils/matchUtils';
 import Pagination from '../common/Pagination';
 
 interface MatchPaginationProps {
