@@ -30,6 +30,7 @@ export default function MatchDetail() {
     const { data: matchData, isLoading: loading, error } = useMatchDetail(matchId!);
     const { setBreadcrumbs, setSelectedMatchId, setSelectedMatchTitle } = useAppStore();
     const [tab, setTab] = useState<'lineups' | 'events'>('lineups');
+    const [showEventsSidebar, setShowEventsSidebar] = useState(false);
     const playerRef = useRef<MatchPlayerHandle | null>(null);
 
     // Set breadcrumbs when match data is available
@@ -142,14 +143,38 @@ export default function MatchDetail() {
             <h2>
                 {match.home_team?.name || 'Home'} vs {match.away_team?.name || 'Away'}
             </h2>
-            <div className="video-section">
-                {hasVideo ? (
-                    <MatchPlayer
-                        ref={playerRef}
-                        hlsUrl={videoUrl}
-                    />
-                ) : (
-                    <div className="no-video">No video available</div>
+            <div className={showEventsSidebar ? "video-and-events-container" : "video-section"}>
+                <div className="video-content">
+                    {hasVideo ? (
+                        <MatchPlayer
+                            ref={playerRef}
+                            hlsUrl={videoUrl}
+                        />
+                    ) : (
+                        <div className="no-video">No video available</div>
+                    )}
+                </div>
+                {showEventsSidebar && (
+                    <div className="events-sidebar">
+                        <div className="events-sidebar-header">
+                            <h3>Match Events</h3>
+                            <button
+                                className="close-events-sidebar"
+                                onClick={() => {
+                                    setShowEventsSidebar(false);
+                                    setTab('lineups');
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <EventsTab
+                            events={events}
+                            hasVideo={hasVideo}
+                            onEventClick={handleEventClick}
+                            onPlayerClick={handlePlayerClick}
+                        />
+                    </div>
                 )}
             </div>
             <div className="tabs">
@@ -157,13 +182,20 @@ export default function MatchDetail() {
                     <button
                         key={t.key}
                         className={tab === t.key ? 'tab active' : 'tab'}
-                        onClick={() => setTab(t.key)}
+                        onClick={() => {
+                            setTab(t.key);
+                            if (t.key === 'events') {
+                                setShowEventsSidebar(true);
+                            } else {
+                                setShowEventsSidebar(false);
+                            }
+                        }}
                     >
                         {t.label}
                     </button>
                 ))}
             </div>
-            {tab === 'lineups' && (
+            {tab === 'lineups' && !showEventsSidebar && (
                 <div className="lineups-table">
                     <h3 style={{ textAlign: 'center', marginBottom: '20px' }}>Starting Lineups</h3>
                     <table className="lineup-comparison-table">
@@ -250,14 +282,7 @@ export default function MatchDetail() {
                     </table>
                 </div>
             )}
-            {tab === 'events' && (
-                <EventsTab
-                    events={events}
-                    hasVideo={hasVideo}
-                    onEventClick={handleEventClick}
-                    onPlayerClick={handlePlayerClick}
-                />
-            )}
+
         </div>
     );
 }
