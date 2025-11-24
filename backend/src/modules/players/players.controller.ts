@@ -35,21 +35,6 @@ export class PlayersController {
     return this.playersService.getPlayerMatches(id);
   }
 
-  @Put(':id/stats')
-  @ApiOperation({ summary: 'Update player statistics' })
-  @ApiResponse({ status: 200, description: 'Player stats updated successfully' })
-  @ApiResponse({ status: 404, description: 'Player not found' })
-  async updatePlayerStats(
-    @Param('id') id: string,
-    @Body() updateStatsDto: UpdatePlayerStatsDto,
-  ) {
-    const result = await this.playersService.updatePlayerStats(id, updateStatsDto);
-    if (!result) {
-      throw new HttpException('Player not found', HttpStatus.NOT_FOUND);
-    }
-    return { message: 'Player stats updated successfully', data: result };
-  }
-
   @Patch(':id/stats')
   @ApiOperation({ summary: 'Partially update player statistics' })
   @ApiResponse({ status: 200, description: 'Player stats updated successfully' })
