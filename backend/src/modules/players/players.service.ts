@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { EasyCoachPlayersApiService } from './easycoach-players-api.service';
 import { Player } from './entities/player.entity';
 import { PlayerStat } from './entities/player-stat.entity';
+import { UpdatePlayerStatsDto } from './dto/update-player-stats.dto';
 
 @Injectable()
 export class PlayersService {
@@ -13,7 +14,7 @@ export class PlayersService {
     @InjectRepository(PlayerStat)
     private readonly playerStatRepository: Repository<PlayerStat>,
     private readonly api: EasyCoachPlayersApiService,
-  ) {}
+  ) { }
 
   async getPlayers(teamId?: string) {
     // Try to get from database first
@@ -144,33 +145,26 @@ export class PlayersService {
 
     // Save/update player stats if available
     if (apiPlayer.stats || apiPlayer.passing || apiPlayer.dribbling) {
-      await this.savePlayerStats(player.id, apiPlayer);
+      const statsDto = new UpdatePlayerStatsDto(apiPlayer);
+      await this.savePlayerStats(player.id, statsDto);
     }
 
     return player;
   }
 
-  private async savePlayerStats(playerId: number, statsData: any) {
+  private async savePlayerStats(playerId: number, statsData: UpdatePlayerStatsDto) {
     const existingStats = await this.playerStatRepository.findOne({
       where: { player_id: playerId },
     });
 
-    const stats = {
-      player_id: playerId,
-      passing: statsData.passing || statsData.stats?.passing,
-      dribbling: statsData.dribbling || statsData.stats?.dribbling,
-      speed: statsData.speed || statsData.stats?.speed,
-      strength: statsData.strength || statsData.stats?.strength,
-      vision: statsData.vision || statsData.stats?.vision,
-      defending: statsData.defending || statsData.stats?.defending,
-      shooting: statsData.shooting || statsData.stats?.shooting,
-      potential: statsData.potential || statsData.stats?.potential,
-    };
-
     if (existingStats) {
-      await this.playerStatRepository.update(existingStats.id, stats);
+      await this.playerStatRepository.update(existingStats.id, statsData);
     } else {
-      await this.playerStatRepository.save(stats);
+      const newStats = this.playerStatRepository.create({
+        player_id: playerId,
+        ...statsData,
+      });
+      await this.playerStatRepository.save(newStats);
     }
   }
 }
