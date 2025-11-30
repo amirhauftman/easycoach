@@ -30,20 +30,20 @@ This repository contains a simple full-stack example that integrates with the Ea
 
 ```mermaid
 flowchart LR
-   subgraph FE [Frontend\nReact + Vite]
+   subgraph FE["Frontend<br/>React + Vite"]
       direction TB
-      FE_Components[Components\n(Pages, MatchCard, PlayerCard)]
-      FE_Hooks[Hooks\n(useMatchList, useMatchDetail)]
-      FE_Stores[Stores\n(Zustand)]
-      FE_Services[API Service\n(easycoach-api.ts, axios)]
+      FE_Components["Components<br/>(Pages, MatchCard, PlayerCard)"]
+      FE_Hooks["Hooks<br/>(useMatchList, useMatchDetail)"]
+      FE_Stores["Stores<br/>(Zustand)"]
+      FE_Services["API Service<br/>(easycoach-api.ts, axios)"]
    end
 
-   subgraph BE [Backend\nNestJS]
+   subgraph BE["Backend<br/>NestJS"]
       direction TB
-      BE_Controllers[Controllers\n(matches.controller.ts, players.controller.ts)]
-      BE_Services[Services\n(matches.service.ts, players.service.ts)]
-      BE_Modules[Modules\n(matches, players, ...)]
-      BE_TypeORM[TypeORM\n(entities, migrations)]
+      BE_Controllers["Controllers<br/>(matches.controller.ts, players.controller.ts)"]
+      BE_Services["Services<br/>(matches.service.ts, players.service.ts)"]
+      BE_Modules["Modules<br/>(matches, players, ...)"]
+      BE_TypeORM["TypeORM<br/>(entities, migrations)"]
    end
 
    DB[(PostgreSQL DB)]
@@ -56,9 +56,9 @@ flowchart LR
    BE_Services --> BE_TypeORM
    BE_TypeORM --> DB
 
-   subgraph Public [Public & Assets]
-      StaticData[public/data/*.json]
-      Media[public/assets]
+   subgraph Public["Public & Assets"]
+      StaticData["public/data/*.json"]
+      Media["public/assets"]
    end
    FE_Components --> StaticData
    FE_Components --> Media
