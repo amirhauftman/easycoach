@@ -26,6 +26,44 @@ This repository contains a simple full-stack example that integrates with the Ea
 - **Database**: PostgreSQL with TypeORM migrations.
 - **Testing**: Jest for backend, Vitest for frontend components.
 
+### Architecture diagram (Mermaid)
+
+```mermaid
+flowchart LR
+   subgraph FE [Frontend\nReact + Vite]
+      direction TB
+      FE_Components[Components\n(Pages, MatchCard, PlayerCard)]
+      FE_Hooks[Hooks\n(useMatchList, useMatchDetail)]
+      FE_Stores[Stores\n(Zustand)]
+      FE_Services[API Service\n(easycoach-api.ts, axios)]
+   end
+
+   subgraph BE [Backend\nNestJS]
+      direction TB
+      BE_Controllers[Controllers\n(matches.controller.ts, players.controller.ts)]
+      BE_Services[Services\n(matches.service.ts, players.service.ts)]
+      BE_Modules[Modules\n(matches, players, ...)]
+      BE_TypeORM[TypeORM\n(entities, migrations)]
+   end
+
+   DB[(PostgreSQL DB)]
+
+   FE_Components --> FE_Hooks
+   FE_Hooks --> FE_Stores
+   FE_Components --> FE_Services
+   FE_Services -->|HTTP / REST| BE_Controllers
+   BE_Controllers --> BE_Services
+   BE_Services --> BE_TypeORM
+   BE_TypeORM --> DB
+
+   subgraph Public [Public & Assets]
+      StaticData[public/data/*.json]
+      Media[public/assets]
+   end
+   FE_Components --> StaticData
+   FE_Components --> Media
+```
+
 ## 📋 Prerequisites
 
 - Node.js 18+ and npm
